@@ -1,0 +1,67 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {readFile} from 'node:fs/promises';
+import {JSDOM} from 'jsdom';
+
+test('listening reveal, retry, saved mastery, reset and pinyin progression', async () => {
+  const html=await readFile(new URL('../dist/index.html',import.meta.url),'utf8');
+  const dom=new JSDOM(html,{url:'https://ting.test'});
+  const spoken=[];
+  const voice={voiceURI:'mandarin',name:'Tingting',lang:'zh-CN',localService:true};
+  dom.window.speechSynthesis={cancel(){},getVoices:()=>[voice],addEventListener(){},speak:utterance=>spoken.push(utterance)};
+  globalThis.window=dom.window;
+  globalThis.document=dom.window.document;
+  globalThis.localStorage=dom.window.localStorage;
+  globalThis.SpeechSynthesisUtterance=class {constructor(text){this.text=text}};
+  const $=selector=>document.querySelector(selector);
+  const click=selector=>$(selector).click();
+  const errors=[];dom.window.addEventListener('error',event=>errors.push(event.error));
+  try {
+    await import('../dist/app.js?study-flow');
+    $('#words').value='冬天|dōng tiān\n夏天|xià tiān';$('#words').oninput();
+    click('#start');
+    assert.equal($('#visual').textContent,'');
+    assert.equal(spoken.at(-1).text,'冬天');
+    assert.equal($('#memorized').hidden,true);
+    click('#reveal');
+    assert.equal($('.hanzi').textContent,'冬天');
+    assert.equal($('.revealed-pinyin').textContent,'dōng tiān');
+    click('#memorized');
+    assert.equal($('#counter').textContent,'1 memorized · 1 to practice');
+    assert.equal($('#visual').textContent,'');
+    assert.equal(spoken.at(-1).text,'夏天');
+    click('#reveal');click('#next');
+    assert.equal($('#counter').textContent,'1 memorized · 1 to practice');
+    assert.equal($('#visual').textContent,'');
+    click('#back');click('#start');
+    assert.equal(spoken.at(-1).text,'夏天');
+    click('#reveal');click('#memorized');
+    assert.match($('.stage').textContent,/All words memorized/);
+    assert.equal($('#progressMeter').getAttribute('aria-valuenow'),'2');
+    click('#back');click('#start');
+    assert.match($('.stage').textContent,/All words memorized/);
+    click('.stage .next');
+    assert.equal($('#counter').textContent,'0 memorized · 2 to practice');
+    assert.equal($('#visual').textContent,'');
+    click('#back');click('[data-mode="pinyin"]');click('#start');click('#start');
+    assert.equal($('.hanzi').textContent,'冬天');
+    assert.equal($('#reveal').hidden,true);
+    $('#answer').value='dong4 tian1';click('#check');
+    assert.equal($('#memorized').hidden,true);
+    click('#next');
+    assert.equal($('.hanzi').textContent,'夏天');
+    $('#answer').value='xia4 tian1';click('#check');click('#memorized');
+    assert.equal($('.hanzi').textContent,'冬天');
+    $('#answer').value='dong1 tian1';click('#check');click('#memorized');
+    assert.match($('.stage').textContent,/All words memorized/);
+    click('#back');
+    assert.match($('#savedProgress').textContent,/2 of 2/);
+    click('[data-mode="listen"]');
+    assert.match($('#savedProgress').textContent,/0 of 2/);
+    assert.match($('.playback-hint').textContent,/try a few times/);
+    assert.deepEqual(errors,[]);
+  } finally {
+    dom.window.close();
+    for(const key of ['window','document','localStorage','SpeechSynthesisUtterance'])delete globalThis[key];
+  }
+});

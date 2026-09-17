@@ -3,19 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#12231d">
+  <meta name="theme-color" content="#f4f4f1">
   <meta name="description" content="A focused Chinese listening and pinyin study tool.">
   <title>Tīng · Chinese listening practice</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23d95d39'/%3E%3Cpath d='M18 27h10l12-10v30L28 37H18z' fill='white'/%3E%3Cpath d='M45 24c5 5 5 11 0 16' fill='none' stroke='white' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
-  <style>
-    :root{--ink:#17251f;--muted:#66726c;--paper:#f4f1e9;--card:#fffdf7;--line:#d8d7ce;--orange:#d95d39;--green:#1f6b50;--soft:#e8eee8;--red:#a9412b}
-    *{box-sizing:border-box} body{margin:0;min-height:100vh;background:var(--paper);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px}
-    button,input,textarea{font:inherit} button{cursor:pointer}.shell{max-width:1100px;margin:auto;padding:28px 24px 48px}.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:36px}.brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:-.02em;font-size:1.15rem}.mark{width:38px;height:38px;border-radius:12px;background:var(--orange);color:white;display:grid;place-items:center;font-size:1.35rem}.small{font-size:.88rem;color:var(--muted)}
-    .setup{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr);gap:24px}.panel{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:24px;box-shadow:0 12px 32px rgba(30,50,40,.06)}h1{font-family:Georgia,"Noto Serif SC",serif;font-size:clamp(2.2rem,5vw,4rem);line-height:.95;letter-spacing:-.045em;margin:4px 0 14px;max-width:650px}.lede{color:var(--muted);font-size:1.05rem;line-height:1.55;max-width:600px;margin:0 0 30px}.field-label{font-weight:750;display:block;margin:0 0 10px}.hint{font-weight:400;color:var(--muted);font-size:.86rem}.entry{width:100%;min-height:235px;padding:16px;border:1.5px solid var(--line);border-radius:15px;background:#fff;resize:vertical;line-height:1.7;color:var(--ink);outline:none}.entry:focus,.answer:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(31,107,80,.12)}
-    .mode-grid{display:grid;gap:12px;margin:8px 0 22px}.mode{position:relative;text-align:left;border:1.5px solid var(--line);border-radius:15px;background:white;padding:16px 16px 16px 50px;color:var(--ink)}.mode:before{content:"";position:absolute;left:17px;top:19px;width:16px;height:16px;border:2px solid #9ca59f;border-radius:50%}.mode.active{border-color:var(--green);background:var(--soft)}.mode.active:before{border:5px solid var(--green);width:10px;height:10px}.mode strong{display:block;margin-bottom:4px}.primary{width:100%;border:0;border-radius:14px;background:var(--orange);color:white;padding:15px 20px;font-weight:800;box-shadow:0 6px 0 #a9412b}.primary:active{transform:translateY(3px);box-shadow:0 3px 0 #a9412b}.note{margin:17px 0 0;color:var(--muted);font-size:.82rem;line-height:1.45}
-    .study{display:none;max-width:760px;margin:20px auto 0}.study.active{display:block}.study-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.ghost{border:0;background:transparent;color:var(--muted);padding:8px;font-weight:700}.progress{height:7px;background:#dedfd8;border-radius:9px;overflow:hidden;margin-bottom:20px}.progress i{display:block;height:100%;background:var(--green);width:0;transition:width .25s}.stage{min-height:460px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center}.eyebrow{text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-size:.75rem;font-weight:800}.hidden-word{margin:20px 0 28px;width:170px;height:170px;border-radius:50%;background:var(--soft);display:grid;place-items:center;color:var(--green);font-size:3.8rem}.hanzi{font-family:"Noto Serif SC","Songti SC",serif;font-size:clamp(4.5rem,15vw,8rem);line-height:1.1;margin:18px 0 28px}.answer{width:min(420px,100%);padding:15px 18px;border:1.5px solid var(--line);border-radius:13px;text-align:center;font-size:1.2rem;outline:none}.controls{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:22px}.secondary,.next{border-radius:13px;padding:13px 19px;font-weight:800}.secondary{border:1px solid var(--line);background:white;color:var(--ink)}.next{border:0;background:var(--green);color:white;min-width:150px}.feedback{min-height:30px;margin-top:16px;font-weight:750}.feedback.good{color:var(--green)}.feedback.bad{color:var(--red)}.complete{font-size:4rem;margin-bottom:12px}.review{display:none;margin-top:18px;border-top:1px solid var(--line);padding-top:18px}.review.open{display:block}.review-row{display:grid;grid-template-columns:1fr 1.5fr auto;gap:8px;margin-bottom:8px}.review-row input{min-width:0;padding:10px;border:1px solid var(--line);border-radius:9px;background:white}.warn{color:var(--red);font-size:.78rem;align-self:center}
-    @media(max-width:760px){.shell{padding:20px 14px 36px}.topbar{margin-bottom:24px}.setup{grid-template-columns:1fr}.panel{padding:19px}.entry{min-height:185px}.stage{min-height:430px}.review-row{grid-template-columns:.8fr 1.4fr}.review-row .warn{grid-column:1/-1}.small.top{display:none}}
-  </style>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='5' fill='%23334c61'/%3E%3Cpath d='M18 27h10l12-10v30L28 37H18z' fill='white'/%3E%3Cpath d='M45 24c5 5 5 11 0 16' fill='none' stroke='white' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="polish.css">
   <link rel="stylesheet" href="input.css">
 </head>
@@ -24,8 +15,8 @@
     <header class="topbar"><div class="brand"><span class="mark">听</span> Tīng</div><span class="small top">Chinese listening practice</span></header>
     <section id="setup" class="setup">
       <div>
-        <h1>A little listening.<br>A lot of progress.</h1>
-        <p class="lede">Your words, at your pace. Build a list and settle into a focused Mandarin practice.</p>
+        <h1>Chinese practice</h1>
+        <p class="lede">Add your words. Work through them at your own pace.</p>
         <label class="field-label" for="words">Study list <span class="hint">· one item per line</span></label>
         <div class="list-actions"><button id="dictate" class="secondary" type="button" aria-pressed="false">Speak words</button><button id="formatList" class="secondary" type="button">Smart format list</button><button id="fillPinyin" class="secondary" type="button">Add missing pinyin</button></div>
         <p id="dictationStatus" class="note" role="status">Speak Mandarin. Recognized words are split onto separate lines with pinyin. Your browser may send audio to its speech service for transcription.</p>
@@ -41,12 +32,13 @@
       <aside class="panel">
         <label class="field-label">Choose a study mode</label>
         <div class="mode-grid">
-          <button class="mode active" data-mode="listen"><strong>Listening recall</strong><span class="small">Hear a word with no preview. Say or write the meaning, then move on.</span></button>
+          <button class="mode active" data-mode="listen"><strong>Listening recall</strong><span class="small">Listen with the word hidden. Reveal it to check, then decide if you know it.</span></button>
           <button class="mode" data-mode="pinyin"><strong>Pinyin quiz</strong><span class="small">See and hear the characters, then type the pinyin.</span></button>
         </div>
         <div class="audio-settings"><label for="voice">Mandarin voice</label><select id="voice"><option>Loading voices…</option></select><label for="speed">Speaking speed</label><div class="speed-row"><input id="speed" type="range" min="0.5" max="1.2" step="0.05" value="0.9"><output id="speedValue">0.9×</output></div><button id="testVoice" class="ghost" type="button">▷ Preview voice</button><div id="voiceStatus" class="audio-status" role="status"></div></div>
         <div class="toggles"><label><input id="shuffle" type="checkbox"> Shuffle words</label><label><input id="strict" type="checkbox" checked> Check tones</label></div>
-        <button id="start" class="primary">Start listening →</button>
+        <div class="saved-progress"><p id="savedProgress" class="small"></p><p class="note">Memorized words leave the queue. Words you’re still learning come back for another try.</p><button id="resetProgress" class="ghost" type="button">Reset this list’s progress</button></div>
+        <button id="start" class="primary">Start listening</button>
         <p id="setupError" class="empty-error" role="alert"></p>
         <p class="note">Audio uses the Mandarin voice installed in your browser. Turn your volume on before starting.</p>
       </aside>
@@ -54,7 +46,7 @@
 
     <section id="study" class="study">
       <div class="study-head"><button id="back" class="ghost">← Edit list</button><span id="counter" class="small"></span></div>
-      <div class="progress"><i id="bar"></i></div>
+      <div id="progressMeter" class="progress" role="progressbar" aria-label="Words memorized" aria-valuemin="0" aria-valuemax="1" aria-valuenow="0"><i id="bar"></i></div>
       <div class="panel stage">
         <div id="prompt" class="eyebrow">Listen closely</div>
         <div id="visual"></div>
@@ -62,11 +54,14 @@
         <div id="feedback" class="feedback" aria-live="polite"></div>
         <div class="controls">
           <button id="replay" class="secondary">↻ Play again</button>
+          <button id="reveal" class="secondary">Reveal word</button>
           <button id="check" class="secondary">Check answer</button>
-          <button id="next" class="next">Next word →</button>
+          <button id="next" class="secondary">Keep practicing</button>
+          <button id="memorized" class="next" hidden>Memorized</button>
         </div>
       </div>
-      <p class="keyboard-hint">Space to replay · Enter to continue · Esc to edit your list</p>
+      <p class="playback-hint">No sound yet? Click <strong>Play again</strong>. You may need to try a few times—wait a moment between clicks.</p>
+      <p class="keyboard-hint">Space to replay · Esc to return to your list</p>
     </section>
   </main>
   <script type="module" src="app.js"></script>

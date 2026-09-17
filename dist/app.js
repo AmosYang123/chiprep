@@ -1,5 +1,5 @@
 import {parseWords,matchesPinyin,mandarinVoices} from './study-core.js';
-import {withPinyin, setupDictation} from './dictation.js';
+import {withPinyin, setupDictation, formatStudyList} from './dictation.js';
 const $ = selector => document.querySelector(selector);
 const phraseMap={"你好":"nǐ hǎo","朋友":"péng you","学习":"xué xí","图书馆":"tú shū guǎn","明天":"míng tiān","中国":"zhōng guó","中文":"zhōng wén","老师":"lǎo shī","学生":"xué sheng","谢谢":"xiè xie","再见":"zài jiàn","银行":"yín háng","东西":"dōng xi","什么":"shén me","喜欢":"xǐ huan","认识":"rèn shi","工作":"gōng zuò","学校":"xué xiào","北京":"běi jīng","今天":"jīn tiān","昨天":"zuó tiān","天气":"tiān qì","吃饭":"chī fàn","喝水":"hē shuǐ","可以":"kě yǐ","没有":"méi yǒu","多少":"duō shao","名字":"míng zi","家人":"jiā rén"};
 let mode='listen',items=[],index=0,answered=false,active=false,score=0,voices=[],utterance=null,speechId=0;
@@ -94,6 +94,7 @@ $('#start').onclick=begin;$('#back').onclick=back;
 function fillPinyin(){const value=withPinyin($('#words').value);if(value!==$('#words').value){$('#words').value=value;$('#words').oninput()}}
 $('#words').addEventListener('blur',fillPinyin);
 $('#fillPinyin').onclick=()=>{fillPinyin();$('#dictationStatus').textContent='Missing pinyin filled in. Your existing readings were kept.'};
+$('#formatList').onclick=()=>{$('#words').value=formatStudyList($('#words').value);$('#words').oninput();$('#dictationStatus').textContent='Split into study words. Existing pinyin was kept; lines with readings that could not be aligned were left unchanged.'};
 const cancelDictation=setupDictation({
   Recognition:window.SpeechRecognition||window.webkitSpeechRecognition,
   button:$('#dictate'),status:$('#dictationStatus'),beforeStart:stop,

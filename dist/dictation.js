@@ -14,7 +14,34 @@ export function withPinyin(text) {
 }
 
 export function transcriptLines(text) {
-  return text.split(/[，。！？；、,!?;\n]+/u).map(word => word.trim()).filter(Boolean);
+  const chunks=text.split(/[，。！？；、,!?;\n]+/u).map(word=>word.trim()).filter(Boolean);
+  if(typeof Intl.Segmenter!=='function')return chunks;
+  const segmenter=new Intl.Segmenter('zh-CN',{granularity:'word'});
+  return chunks.flatMap(chunk=>{
+    const words=[];
+    for(const part of segmenter.segment(chunk)){
+      if(!part.isWordLike)continue;
+      // Preserve noun compounds that ICU sometimes separates at a place suffix.
+      if(/^[馆館]$/.test(part.segment)&&words.length&&/\p{Script=Han}$/u.test(words.at(-1)))words[words.length-1]+=part.segment;
+      else words.push(part.segment);
+    }
+    return words;
+  });
+}
+
+export function formatStudyList(text) {
+  return text.split('\n').flatMap(line=>{
+    const [original,...given]=line.split('|');
+    const words=transcriptLines(original);
+    if(words.length<=1)return [line];
+    const reading=given.join('|').trim();
+    const syllables=reading.split(/\s+/).filter(Boolean);
+    const aligned=words.every(word=>/^\p{Script=Han}+$/u.test(word))&&syllables.length===words.reduce((n,word)=>n+[...word].length,0);
+    // Never discard a supplied reading we cannot safely align to the split words.
+    if(reading&&!aligned)return [line];
+    let offset=0;
+    return words.map(word=>{const length=[...word].length;const value=aligned?syllables.slice(offset,offset+length).join(' '):readingFor(word);offset+=length;return value?word+'|'+value:word});
+  }).join('\n');
 }
 
 export function setupDictation({Recognition, button, status, append, beforeStart, onBusy}) {
@@ -41,7 +68,7 @@ export function setupDictation({Recognition, button, status, append, beforeStart
     current.lang='zh-CN';current.continuous=true;current.interimResults=true;
     let added=0,failed=false;
     button.textContent='Stop listening';button.setAttribute('aria-pressed','true');onBusy(true);
-    status.textContent='Listening in Mandarin… Pause between words. Press Stop when finished.';
+    status.textContent='Listening in Mandarin… Words are split into separate lines automatically. Press Stop when finished.';
     current.onresult = event => {
       if (recognition !== current) return;
       let preview='';

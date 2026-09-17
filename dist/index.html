@@ -16,14 +16,15 @@
     .study{display:none;max-width:760px;margin:20px auto 0}.study.active{display:block}.study-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.ghost{border:0;background:transparent;color:var(--muted);padding:8px;font-weight:700}.progress{height:7px;background:#dedfd8;border-radius:9px;overflow:hidden;margin-bottom:20px}.progress i{display:block;height:100%;background:var(--green);width:0;transition:width .25s}.stage{min-height:460px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center}.eyebrow{text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-size:.75rem;font-weight:800}.hidden-word{margin:20px 0 28px;width:170px;height:170px;border-radius:50%;background:var(--soft);display:grid;place-items:center;color:var(--green);font-size:3.8rem}.hanzi{font-family:"Noto Serif SC","Songti SC",serif;font-size:clamp(4.5rem,15vw,8rem);line-height:1.1;margin:18px 0 28px}.answer{width:min(420px,100%);padding:15px 18px;border:1.5px solid var(--line);border-radius:13px;text-align:center;font-size:1.2rem;outline:none}.controls{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:22px}.secondary,.next{border-radius:13px;padding:13px 19px;font-weight:800}.secondary{border:1px solid var(--line);background:white;color:var(--ink)}.next{border:0;background:var(--green);color:white;min-width:150px}.feedback{min-height:30px;margin-top:16px;font-weight:750}.feedback.good{color:var(--green)}.feedback.bad{color:var(--red)}.complete{font-size:4rem;margin-bottom:12px}.review{display:none;margin-top:18px;border-top:1px solid var(--line);padding-top:18px}.review.open{display:block}.review-row{display:grid;grid-template-columns:1fr 1.5fr auto;gap:8px;margin-bottom:8px}.review-row input{min-width:0;padding:10px;border:1px solid var(--line);border-radius:9px;background:white}.warn{color:var(--red);font-size:.78rem;align-self:center}
     @media(max-width:760px){.shell{padding:20px 14px 36px}.topbar{margin-bottom:24px}.setup{grid-template-columns:1fr}.panel{padding:19px}.entry{min-height:185px}.stage{min-height:430px}.review-row{grid-template-columns:.8fr 1.4fr}.review-row .warn{grid-column:1/-1}.small.top{display:none}}
   </style>
+  <link rel="stylesheet" href="polish.css">
 </head>
 <body>
   <main class="shell">
     <header class="topbar"><div class="brand"><span class="mark">听</span> Tīng</div><span class="small top">Chinese listening practice</span></header>
     <section id="setup" class="setup">
       <div>
-        <h1>Hear it. Recall it. Own it.</h1>
-        <p class="lede">Paste the Chinese you want to study. Tīng keeps the answer out of sight so your ears—not your eyes—do the work.</p>
+        <h1>A little listening.<br>A lot of progress.</h1>
+        <p class="lede">Your words, at your pace. Build a list and settle into a focused Mandarin practice.</p>
         <label class="field-label" for="words">Study list <span class="hint">· one item per line</span></label>
         <textarea id="words" class="entry" spellcheck="false" placeholder="你好&#10;朋友&#10;学习&#10;图书馆|tú shū guǎn">你好|nǐ hǎo
 朋友|péng you
@@ -39,7 +40,10 @@
           <button class="mode active" data-mode="listen"><strong>Listening recall</strong><span class="small">Hear a word with no preview. Say or write the meaning, then move on.</span></button>
           <button class="mode" data-mode="pinyin"><strong>Pinyin quiz</strong><span class="small">See and hear the characters, then type the pinyin.</span></button>
         </div>
-        <button id="start" class="primary">Start listening</button>
+        <div class="audio-settings"><label for="voice">Mandarin voice</label><select id="voice"><option>Loading voices…</option></select><label for="speed">Speaking speed</label><div class="speed-row"><input id="speed" type="range" min="0.5" max="1.2" step="0.05" value="0.9"><output id="speedValue">0.9×</output></div><button id="testVoice" class="ghost" type="button">▷ Preview voice</button><div id="voiceStatus" class="audio-status" role="status"></div></div>
+        <div class="toggles"><label><input id="shuffle" type="checkbox"> Shuffle words</label><label><input id="strict" type="checkbox" checked> Check tones</label></div>
+        <button id="start" class="primary">Start listening →</button>
+        <p id="setupError" class="empty-error" role="alert"></p>
         <p class="note">Audio uses the Mandarin voice installed in your browser. Turn your volume on before starting.</p>
       </aside>
     </section>
@@ -50,7 +54,7 @@
       <div class="panel stage">
         <div id="prompt" class="eyebrow">Listen closely</div>
         <div id="visual"></div>
-        <input id="answer" class="answer" autocomplete="off" autocapitalize="none" placeholder="Type pinyin…">
+        <input id="answer" class="answer" aria-label="Your pinyin answer" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Pinyin: nǐ hǎo or ni3 hao3">
         <div id="feedback" class="feedback" aria-live="polite"></div>
         <div class="controls">
           <button id="replay" class="secondary">↻ Play again</button>
@@ -58,27 +62,9 @@
           <button id="next" class="next">Next word →</button>
         </div>
       </div>
+      <p class="keyboard-hint">Space to replay · Enter to continue · Esc to edit your list</p>
     </section>
   </main>
-  <script>
-    const $=s=>document.querySelector(s);
-    const phraseMap={"你好":"nǐ hǎo","朋友":"péng you","学习":"xué xí","图书馆":"tú shū guǎn","明天":"míng tiān","中国":"zhōng guó","中文":"zhōng wén","老师":"lǎo shī","学生":"xué sheng","谢谢":"xiè xie","再见":"zài jiàn","银行":"yín háng","东西":"dōng xi","什么":"shén me","喜欢":"xǐ huan","认识":"rèn shi","工作":"gōng zuò","学校":"xué xiào","北京":"běi jīng","今天":"jīn tiān","昨天":"zuó tiān","天气":"tiān qì","吃饭":"chī fàn","喝水":"hē shuǐ","可以":"kě yǐ","没有":"méi yǒu","多少":"duō shao","名字":"míng zi","家人":"jiā rén"};
-    let mode='listen',items=[],index=0,answered=false;
-    const tonePlain=s=>s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[1-5]/g,'').replace(/[^a-züv]/g,'');
-    function parse(){return $('#words').value.split(/\n+/).map(x=>x.trim()).filter(Boolean).map(line=>{const [hanzi,...rest]=line.split('|');const given=rest.join('|').trim();return{hanzi:hanzi.trim(),pinyin:given||phraseMap[hanzi.trim()]||'',known:Boolean(given||phraseMap[hanzi.trim()])}})}
-    function renderReview(){items=parse();const box=$('#reviewRows');box.innerHTML='';items.forEach((it,i)=>{const row=document.createElement('div');row.className='review-row';row.innerHTML=`<input value="${it.hanzi.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" aria-label="Chinese item ${i+1}"><input value="${it.pinyin.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" placeholder="Add pinyin" aria-label="Pinyin for ${it.hanzi}">${it.known?'':'<span class="warn">Needs pinyin</span>'}`;box.append(row)});$('#review').classList.add('open')}
-    function collectReview(){const rows=[...document.querySelectorAll('.review-row')];items=rows.map(r=>({hanzi:r.children[0].value.trim(),pinyin:r.children[1].value.trim()})).filter(x=>x.hanzi)}
-    function speak(){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(items[index].hanzi);u.lang='zh-CN';u.rate=.72;const voices=speechSynthesis.getVoices();u.voice=voices.find(v=>/^zh(-|_)?CN/i.test(v.lang))||voices.find(v=>/^zh/i.test(v.lang))||null;speechSynthesis.speak(u)}
-    function show(){answered=false;$('#feedback').textContent='';$('#feedback').className='feedback';$('#answer').value='';$('#counter').textContent=`${index+1} of ${items.length}`;$('#bar').style.width=`${(index/items.length)*100}%`;if(mode==='listen'){$('#prompt').textContent='Listen closely';$('#visual').innerHTML='<div class="hidden-word">♫</div>';$('#answer').style.display='none';$('#check').style.display='none';$('#next').textContent=index===items.length-1?'Finish':'Next word →'}else{$('#prompt').textContent='Write the pinyin';$('#visual').innerHTML=`<div class="hanzi">${items[index].hanzi}</div>`;$('#answer').style.display='block';$('#check').style.display='inline-block';$('#next').textContent=index===items.length-1?'Finish':'Skip →';setTimeout(()=>$('#answer').focus(),60)}setTimeout(speak,120)}
-    function finish(){speechSynthesis.cancel();$('#bar').style.width='100%';$('.stage').innerHTML='<div class="complete">好!</div><h2>Set complete</h2><p class="small">You worked through every item.</p><button class="next" onclick="location.reload()">Study again</button>'}
-    document.querySelectorAll('.mode').forEach(b=>b.onclick=()=>{document.querySelectorAll('.mode').forEach(x=>x.classList.remove('active'));b.classList.add('active');mode=b.dataset.mode;$('#start').textContent=mode==='listen'?'Start listening':'Review pinyin';$('#review').classList.remove('open')});
-    $('#start').onclick=()=>{items=parse();if(!items.length){$('#words').focus();return}if(mode==='pinyin'&&!$('#review').classList.contains('open')){renderReview();$('#start').textContent='Begin quiz';return}if(mode==='pinyin')collectReview();index=0;$('#setup').style.display='none';$('#study').classList.add('active');show()};
-    $('#back').onclick=()=>{speechSynthesis.cancel();$('#study').classList.remove('active');$('#setup').style.display='grid'};
-    $('#replay').onclick=speak;
-    $('#check').onclick=()=>{const expected=items[index].pinyin;if(!expected){$('#feedback').textContent='Add pinyin for this word from the edit screen.';$('#feedback').className='feedback bad';return}const good=tonePlain($('#answer').value)===tonePlain(expected);$('#feedback').textContent=good?'Correct — '+expected:'Not quite. Answer: '+expected;$('#feedback').className='feedback '+(good?'good':'bad');answered=true;$('#next').textContent=index===items.length-1?'Finish':'Next word →'};
-    $('#next').onclick=()=>{if(index>=items.length-1)finish();else{index++;show()}};
-    $('#answer').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();answered?$('#next').click():$('#check').click()}});
-    speechSynthesis.getVoices();
-  </script>
+  <script type="module" src="app.js"></script>
 </body>
 </html>

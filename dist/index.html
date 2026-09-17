@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#12231d">
+  <meta name="description" content="A focused Chinese listening and pinyin study tool.">
+  <title>Tīng · Chinese listening practice</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23d95d39'/%3E%3Cpath d='M18 27h10l12-10v30L28 37H18z' fill='white'/%3E%3Cpath d='M45 24c5 5 5 11 0 16' fill='none' stroke='white' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+  <style>
+    :root{--ink:#17251f;--muted:#66726c;--paper:#f4f1e9;--card:#fffdf7;--line:#d8d7ce;--orange:#d95d39;--green:#1f6b50;--soft:#e8eee8;--red:#a9412b}
+    *{box-sizing:border-box} body{margin:0;min-height:100vh;background:var(--paper);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px}
+    button,input,textarea{font:inherit} button{cursor:pointer}.shell{max-width:1100px;margin:auto;padding:28px 24px 48px}.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:36px}.brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:-.02em;font-size:1.15rem}.mark{width:38px;height:38px;border-radius:12px;background:var(--orange);color:white;display:grid;place-items:center;font-size:1.35rem}.small{font-size:.88rem;color:var(--muted)}
+    .setup{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr);gap:24px}.panel{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:24px;box-shadow:0 12px 32px rgba(30,50,40,.06)}h1{font-family:Georgia,"Noto Serif SC",serif;font-size:clamp(2.2rem,5vw,4rem);line-height:.95;letter-spacing:-.045em;margin:4px 0 14px;max-width:650px}.lede{color:var(--muted);font-size:1.05rem;line-height:1.55;max-width:600px;margin:0 0 30px}.field-label{font-weight:750;display:block;margin:0 0 10px}.hint{font-weight:400;color:var(--muted);font-size:.86rem}.entry{width:100%;min-height:235px;padding:16px;border:1.5px solid var(--line);border-radius:15px;background:#fff;resize:vertical;line-height:1.7;color:var(--ink);outline:none}.entry:focus,.answer:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(31,107,80,.12)}
+    .mode-grid{display:grid;gap:12px;margin:8px 0 22px}.mode{position:relative;text-align:left;border:1.5px solid var(--line);border-radius:15px;background:white;padding:16px 16px 16px 50px;color:var(--ink)}.mode:before{content:"";position:absolute;left:17px;top:19px;width:16px;height:16px;border:2px solid #9ca59f;border-radius:50%}.mode.active{border-color:var(--green);background:var(--soft)}.mode.active:before{border:5px solid var(--green);width:10px;height:10px}.mode strong{display:block;margin-bottom:4px}.primary{width:100%;border:0;border-radius:14px;background:var(--orange);color:white;padding:15px 20px;font-weight:800;box-shadow:0 6px 0 #a9412b}.primary:active{transform:translateY(3px);box-shadow:0 3px 0 #a9412b}.note{margin:17px 0 0;color:var(--muted);font-size:.82rem;line-height:1.45}
+    .study{display:none;max-width:760px;margin:20px auto 0}.study.active{display:block}.study-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.ghost{border:0;background:transparent;color:var(--muted);padding:8px;font-weight:700}.progress{height:7px;background:#dedfd8;border-radius:9px;overflow:hidden;margin-bottom:20px}.progress i{display:block;height:100%;background:var(--green);width:0;transition:width .25s}.stage{min-height:460px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center}.eyebrow{text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-size:.75rem;font-weight:800}.hidden-word{margin:20px 0 28px;width:170px;height:170px;border-radius:50%;background:var(--soft);display:grid;place-items:center;color:var(--green);font-size:3.8rem}.hanzi{font-family:"Noto Serif SC","Songti SC",serif;font-size:clamp(4.5rem,15vw,8rem);line-height:1.1;margin:18px 0 28px}.answer{width:min(420px,100%);padding:15px 18px;border:1.5px solid var(--line);border-radius:13px;text-align:center;font-size:1.2rem;outline:none}.controls{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:22px}.secondary,.next{border-radius:13px;padding:13px 19px;font-weight:800}.secondary{border:1px solid var(--line);background:white;color:var(--ink)}.next{border:0;background:var(--green);color:white;min-width:150px}.feedback{min-height:30px;margin-top:16px;font-weight:750}.feedback.good{color:var(--green)}.feedback.bad{color:var(--red)}.complete{font-size:4rem;margin-bottom:12px}.review{display:none;margin-top:18px;border-top:1px solid var(--line);padding-top:18px}.review.open{display:block}.review-row{display:grid;grid-template-columns:1fr 1.5fr auto;gap:8px;margin-bottom:8px}.review-row input{min-width:0;padding:10px;border:1px solid var(--line);border-radius:9px;background:white}.warn{color:var(--red);font-size:.78rem;align-self:center}
+    @media(max-width:760px){.shell{padding:20px 14px 36px}.topbar{margin-bottom:24px}.setup{grid-template-columns:1fr}.panel{padding:19px}.entry{min-height:185px}.stage{min-height:430px}.review-row{grid-template-columns:.8fr 1.4fr}.review-row .warn{grid-column:1/-1}.small.top{display:none}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar"><div class="brand"><span class="mark">听</span> Tīng</div><span class="small top">Chinese listening practice</span></header>
+    <section id="setup" class="setup">
+      <div>
+        <h1>Hear it. Recall it. Own it.</h1>
+        <p class="lede">Paste the Chinese you want to study. Tīng keeps the answer out of sight so your ears—not your eyes—do the work.</p>
+        <label class="field-label" for="words">Study list <span class="hint">· one item per line</span></label>
+        <textarea id="words" class="entry" spellcheck="false" placeholder="你好&#10;朋友&#10;学习&#10;图书馆|tú shū guǎn">你好|nǐ hǎo
+朋友|péng you
+学习|xué xí
+图书馆|tú shū guǎn
+明天|míng tiān</textarea>
+        <p class="note">Optional: add your own pinyin after a <b>|</b>, like <b>银行|yín háng</b>. This is best for words with multiple possible pronunciations.</p>
+        <div id="review" class="review"><label class="field-label">Check pinyin <span class="hint">· edit anything before you begin</span></label><div id="reviewRows"></div></div>
+      </div>
+      <aside class="panel">
+        <label class="field-label">Choose a study mode</label>
+        <div class="mode-grid">
+          <button class="mode active" data-mode="listen"><strong>Listening recall</strong><span class="small">Hear a word with no preview. Say or write the meaning, then move on.</span></button>
+          <button class="mode" data-mode="pinyin"><strong>Pinyin quiz</strong><span class="small">See and hear the characters, then type the pinyin.</span></button>
+        </div>
+        <button id="start" class="primary">Start listening</button>
+        <p class="note">Audio uses the Mandarin voice installed in your browser. Turn your volume on before starting.</p>
+      </aside>
+    </section>
+
+    <section id="study" class="study">
+      <div class="study-head"><button id="back" class="ghost">← Edit list</button><span id="counter" class="small"></span></div>
+      <div class="progress"><i id="bar"></i></div>
+      <div class="panel stage">
+        <div id="prompt" class="eyebrow">Listen closely</div>
+        <div id="visual"></div>
+        <input id="answer" class="answer" autocomplete="off" autocapitalize="none" placeholder="Type pinyin…">
+        <div id="feedback" class="feedback" aria-live="polite"></div>
+        <div class="controls">
+          <button id="replay" class="secondary">↻ Play again</button>
+          <button id="check" class="secondary">Check answer</button>
+          <button id="next" class="next">Next word →</button>
+        </div>
+      </div>
+    </section>
+  </main>
+  <script>
+    const $=s=>document.querySelector(s);
+    const phraseMap={"你好":"nǐ hǎo","朋友":"péng you","学习":"xué xí","图书馆":"tú shū guǎn","明天":"míng tiān","中国":"zhōng guó","中文":"zhōng wén","老师":"lǎo shī","学生":"xué sheng","谢谢":"xiè xie","再见":"zài jiàn","银行":"yín háng","东西":"dōng xi","什么":"shén me","喜欢":"xǐ huan","认识":"rèn shi","工作":"gōng zuò","学校":"xué xiào","北京":"běi jīng","今天":"jīn tiān","昨天":"zuó tiān","天气":"tiān qì","吃饭":"chī fàn","喝水":"hē shuǐ","可以":"kě yǐ","没有":"méi yǒu","多少":"duō shao","名字":"míng zi","家人":"jiā rén"};
+    let mode='listen',items=[],index=0,answered=false;
+    const tonePlain=s=>s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[1-5]/g,'').replace(/[^a-züv]/g,'');
+    function parse(){return $('#words').value.split(/\n+/).map(x=>x.trim()).filter(Boolean).map(line=>{const [hanzi,...rest]=line.split('|');const given=rest.join('|').trim();return{hanzi:hanzi.trim(),pinyin:given||phraseMap[hanzi.trim()]||'',known:Boolean(given||phraseMap[hanzi.trim()])}})}
+    function renderReview(){items=parse();const box=$('#reviewRows');box.innerHTML='';items.forEach((it,i)=>{const row=document.createElement('div');row.className='review-row';row.innerHTML=`<input value="${it.hanzi.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" aria-label="Chinese item ${i+1}"><input value="${it.pinyin.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}" placeholder="Add pinyin" aria-label="Pinyin for ${it.hanzi}">${it.known?'':'<span class="warn">Needs pinyin</span>'}`;box.append(row)});$('#review').classList.add('open')}
+    function collectReview(){const rows=[...document.querySelectorAll('.review-row')];items=rows.map(r=>({hanzi:r.children[0].value.trim(),pinyin:r.children[1].value.trim()})).filter(x=>x.hanzi)}
+    function speak(){speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(items[index].hanzi);u.lang='zh-CN';u.rate=.72;const voices=speechSynthesis.getVoices();u.voice=voices.find(v=>/^zh(-|_)?CN/i.test(v.lang))||voices.find(v=>/^zh/i.test(v.lang))||null;speechSynthesis.speak(u)}
+    function show(){answered=false;$('#feedback').textContent='';$('#feedback').className='feedback';$('#answer').value='';$('#counter').textContent=`${index+1} of ${items.length}`;$('#bar').style.width=`${(index/items.length)*100}%`;if(mode==='listen'){$('#prompt').textContent='Listen closely';$('#visual').innerHTML='<div class="hidden-word">♫</div>';$('#answer').style.display='none';$('#check').style.display='none';$('#next').textContent=index===items.length-1?'Finish':'Next word →'}else{$('#prompt').textContent='Write the pinyin';$('#visual').innerHTML=`<div class="hanzi">${items[index].hanzi}</div>`;$('#answer').style.display='block';$('#check').style.display='inline-block';$('#next').textContent=index===items.length-1?'Finish':'Skip →';setTimeout(()=>$('#answer').focus(),60)}setTimeout(speak,120)}
+    function finish(){speechSynthesis.cancel();$('#bar').style.width='100%';$('.stage').innerHTML='<div class="complete">好!</div><h2>Set complete</h2><p class="small">You worked through every item.</p><button class="next" onclick="location.reload()">Study again</button>'}
+    document.querySelectorAll('.mode').forEach(b=>b.onclick=()=>{document.querySelectorAll('.mode').forEach(x=>x.classList.remove('active'));b.classList.add('active');mode=b.dataset.mode;$('#start').textContent=mode==='listen'?'Start listening':'Review pinyin';$('#review').classList.remove('open')});
+    $('#start').onclick=()=>{items=parse();if(!items.length){$('#words').focus();return}if(mode==='pinyin'&&!$('#review').classList.contains('open')){renderReview();$('#start').textContent='Begin quiz';return}if(mode==='pinyin')collectReview();index=0;$('#setup').style.display='none';$('#study').classList.add('active');show()};
+    $('#back').onclick=()=>{speechSynthesis.cancel();$('#study').classList.remove('active');$('#setup').style.display='grid'};
+    $('#replay').onclick=speak;
+    $('#check').onclick=()=>{const expected=items[index].pinyin;if(!expected){$('#feedback').textContent='Add pinyin for this word from the edit screen.';$('#feedback').className='feedback bad';return}const good=tonePlain($('#answer').value)===tonePlain(expected);$('#feedback').textContent=good?'Correct — '+expected:'Not quite. Answer: '+expected;$('#feedback').className='feedback '+(good?'good':'bad');answered=true;$('#next').textContent=index===items.length-1?'Finish':'Next word →'};
+    $('#next').onclick=()=>{if(index>=items.length-1)finish();else{index++;show()}};
+    $('#answer').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();answered?$('#next').click():$('#check').click()}});
+    speechSynthesis.getVoices();
+  </script>
+</body>
+</html>

@@ -1,4 +1,5 @@
 import {parseWords,matchesPinyin,mandarinVoices} from './study-core.js';
+import {withPinyin, setupDictation} from './dictation.js';
 const $ = selector => document.querySelector(selector);
 const phraseMap={"你好":"nǐ hǎo","朋友":"péng you","学习":"xué xí","图书馆":"tú shū guǎn","明天":"míng tiān","中国":"zhōng guó","中文":"zhōng wén","老师":"lǎo shī","学生":"xué sheng","谢谢":"xiè xie","再见":"zài jiàn","银行":"yín háng","东西":"dōng xi","什么":"shén me","喜欢":"xǐ huan","认识":"rèn shi","工作":"gōng zuò","学校":"xué xiào","北京":"běi jīng","今天":"jīn tiān","昨天":"zuó tiān","天气":"tiān qì","吃饭":"chī fàn","喝水":"hē shuǐ","可以":"kě yǐ","没有":"méi yǒu","多少":"duō shao","名字":"míng zi","家人":"jiā rén"};
 let mode='listen',items=[],index=0,answered=false,active=false,score=0,voices=[],utterance=null,speechId=0;
@@ -27,6 +28,7 @@ function speak(text){
   synth.speak(utterance);
 }
 function review(){
+  fillPinyin();
   const box=$('#reviewRows');box.replaceChildren();items=parseWords($('#words').value,phraseMap);
   items.forEach((item,i)=>{
     const row=document.createElement('div');row.className='review-row';
@@ -57,6 +59,7 @@ function show(){
   speak(items[index].hanzi);
 }
 function begin(){
+  cancelDictation();fillPinyin();
   $('#setupError').textContent='';items=parseWords($('#words').value,phraseMap);
   if(!items.length){$('#setupError').textContent='Add at least one Chinese word to start.';$('#words').focus();return}
   if(mode==='pinyin'){
@@ -88,8 +91,17 @@ function back(){stop();active=false;$('#study').classList.remove('active');$('#s
 document.querySelectorAll('.mode').forEach(button=>{button.setAttribute('aria-pressed',button.dataset.mode===mode);button.onclick=()=>{mode=button.dataset.mode;document.querySelectorAll('.mode').forEach(b=>{b.classList.toggle('active',b===button);b.setAttribute('aria-pressed',b===button)});$('#start').textContent=mode==='listen'?'Start listening →':'Review pinyin →';$('#review').classList.remove('open');$('#setupError').textContent=''}});
 $('#words').oninput=()=>{count();save();$('#review').classList.remove('open');$('#start').textContent=mode==='listen'?'Start listening →':'Review pinyin →'};
 $('#start').onclick=begin;$('#back').onclick=back;
+function fillPinyin(){const value=withPinyin($('#words').value);if(value!==$('#words').value){$('#words').value=value;$('#words').oninput()}}
+$('#words').addEventListener('blur',fillPinyin);
+$('#fillPinyin').onclick=()=>{fillPinyin();$('#dictationStatus').textContent='Missing pinyin filled in. Your existing readings were kept.'};
+const cancelDictation=setupDictation({
+  Recognition:window.SpeechRecognition||window.webkitSpeechRecognition,
+  button:$('#dictate'),status:$('#dictationStatus'),beforeStart:stop,
+  onBusy:busy=>{$('#start').disabled=busy;$('#testVoice').disabled=busy||!voices.length},
+  append:words=>{const prior=$('#words').value.trimEnd();$('#words').value=(prior?prior+'\n':'')+withPinyin(words.join('\n'));$('#words').oninput()}
+});
+window.addEventListener('pagehide',cancelDictation);
 $('#speed').oninput=()=>{$('#speedValue').textContent=Number($('#speed').value).toFixed(2).replace(/0$/,'')+'×'};
 $('#testVoice').onclick=()=>speak('你好，我们一起学习中文。');
 document.addEventListener('keydown',e=>{if(!active||e.target.matches('input,textarea,select'))return;if(e.code==='Space'){e.preventDefault();speak(items[index].hanzi)}else if(e.key==='Enter'&&e.target.tagName!=='BUTTON'){e.preventDefault();next()}else if(e.key==='Escape')back()});
 window.addEventListener('pagehide',stop);if(synth)synth.addEventListener('voiceschanged',loadVoices);loadVoices();count();
-

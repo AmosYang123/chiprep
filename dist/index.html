@@ -17,6 +17,7 @@
     @media(max-width:760px){.shell{padding:20px 14px 36px}.topbar{margin-bottom:24px}.setup{grid-template-columns:1fr}.panel{padding:19px}.entry{min-height:185px}.stage{min-height:430px}.review-row{grid-template-columns:.8fr 1.4fr}.review-row .warn{grid-column:1/-1}.small.top{display:none}}
   </style>
   <link rel="stylesheet" href="polish.css">
+  <link rel="stylesheet" href="input.css">
 </head>
 <body>
   <main class="shell">
@@ -26,12 +27,15 @@
         <h1>A little listening.<br>A lot of progress.</h1>
         <p class="lede">Your words, at your pace. Build a list and settle into a focused Mandarin practice.</p>
         <label class="field-label" for="words">Study list <span class="hint">· one item per line</span></label>
+        <div class="list-actions"><button id="dictate" class="secondary" type="button" aria-pressed="false">Speak words</button><button id="fillPinyin" class="secondary" type="button">Add missing pinyin</button></div>
+        <p id="dictationStatus" class="note" role="status">Speak Mandarin and pause between items. Your browser may send audio to its speech service for transcription.</p>
         <textarea id="words" class="entry" spellcheck="false" placeholder="你好&#10;朋友&#10;学习&#10;图书馆|tú shū guǎn">你好|nǐ hǎo
 朋友|péng you
 学习|xué xí
 图书馆|tú shū guǎn
 明天|míng tiān</textarea>
-        <p class="note">Optional: add your own pinyin after a <b>|</b>, like <b>银行|yín háng</b>. This is best for words with multiple possible pronunciations.</p>
+        <p class="note">Pinyin is filled in automatically when you finish editing. You can change any reading after <b>|</b>. Check names and words with multiple readings: context can change the pronunciation.</p>
+        <details class="tone-help"><summary>How do I type tones?</summary><p>Type a number after each syllable: <b>ma1 → mā · ma2 → má · ma3 → mǎ · ma4 → mà</b>. Use <b>5</b> or no number for a neutral tone.</p><p>For 你好, type <b>ni3 hao3</b>. For 女, type <b>nv3</b> or <b>nu:3</b>. Tone marks such as <b>nǐ hǎo</b> work too. Turn off “Check tones” to practice without tone numbers.</p></details>
         <div id="review" class="review"><label class="field-label">Check pinyin <span class="hint">· edit anything before you begin</span></label><div id="reviewRows"></div></div>
       </div>
       <aside class="panel">

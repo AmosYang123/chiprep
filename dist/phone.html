@@ -2,13 +2,16 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2309090b'/%3E%3Cpath d='M18 27h10l12-10v30L28 37H18z' fill='white'/%3E%3Cpath d='M45 24c5 5 5 11 0 16' fill='none' stroke='white' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
   <title>Send a photo · Tīng</title>
-  <link rel="stylesheet" href="polish.css"><link rel="stylesheet" href="workspace.css">
+  <script src="theme.js"></script>
+  <link rel="stylesheet" href="polish.css"><link rel="stylesheet" href="theme.css"><link rel="stylesheet" href="workspace.css">
 </head>
 <body class="phone-page">
   <main class="phone-upload">
-    <div class="brand"><span class="mark">听</span> Tīng</div>
-    <h1>Paper to practice.</h1><p>Take a clear photo of your Chinese words. Upload it to your computer to add them to your study list.</p>
+    <header class="phone-header"><div class="brand"><span class="mark">听</span> Tīng</div><label class="theme-control"><span>Appearance</span><select data-theme-select aria-label="Appearance"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label></header>
+    <h1>Send your study photos</h1><p>Take a clear photo of your Chinese words. Upload it to your computer to add them to your study list.</p>
     <p id="connectionStatus" role="status" aria-live="polite">Connecting to your computer…</p>
     <div class="photo-actions"><button id="capture" class="secondary" type="button" disabled>Take a photo</button><button id="choose" class="secondary" type="button" disabled>Choose photos</button></div>
     <input id="captureFile" type="file" accept="image/*" capture="environment" hidden>

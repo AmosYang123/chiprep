@@ -3,29 +3,30 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f4f1ea">
+  <meta name="theme-color" content="#ffffff">
   <meta name="description" content="A focused Chinese listening and pinyin study tool.">
   <title>Tīng · Chinese listening practice</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='5' fill='%232f4a60'/%3E%3Cpath d='M18 27h10l12-10v30L28 37H18z' fill='white'/%3E%3Cpath d='M45 24c5 5 5 11 0 16' fill='none' stroke='white' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%2309090b'/%3E%3Cpath d='M18 27h10l12-10v30L28 37H18z' fill='white'/%3E%3Cpath d='M45 24c5 5 5 11 0 16' fill='none' stroke='white' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
   <meta property="og:type" content="website">
   <meta property="og:title" content="Tīng · Chinese listening practice">
   <meta property="og:description" content="Add your own Chinese words, hear them spoken, and practise until you know them by ear.">
   <meta name="twitter:card" content="summary">
+  <script src="theme.js"></script>
   <link rel="stylesheet" href="polish.css">
   <link rel="stylesheet" href="input.css">
-  <link rel="stylesheet" href="glass.css">
+  <link rel="stylesheet" href="theme.css">
   <link rel="stylesheet" href="workspace.css">
 </head>
 <body>
   <main class="shell">
-    <header class="topbar"><div class="brand"><span class="mark">听</span> Tīng</div><span class="small top">Chinese listening practice</span></header>
+    <header class="topbar"><div class="brand"><span class="mark">听</span> Tīng</div><div class="header-tools"><span class="small top">Chinese listening practice</span><label class="theme-control"><span>Appearance</span><select data-theme-select aria-label="Appearance"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label></div></header>
     <section id="setup" class="setup">
-      <header class="workspace-heading"><div><h1>Your words, your practice.</h1><p class="lede">Bring a page of Chinese. Leave knowing a little more.</p></div><span class="workspace-stamp" lang="zh-CN" aria-hidden="true">学</span></header>
+      <header class="workspace-heading"><div><h1>Your study space</h1><p class="lede">Add words, choose a mode, and practice.</p></div></header>
       <aside class="panel session-panel" aria-label="Practice settings">
         <label class="field-label">Choose a study mode</label>
         <div class="mode-grid">
-          <button class="mode active" data-mode="listen"><strong>Listening recall</strong><span class="small">Listen with the word hidden. Reveal it to check, then decide if you know it.</span></button>
-          <button class="mode" data-mode="pinyin"><strong>Pinyin quiz</strong><span class="small">See and hear the characters, then type the pinyin.</span></button>
+          <button class="mode active" data-mode="listen"><strong>Listening recall</strong><span class="small">Listen, reveal, and test your recall.</span></button>
+          <button class="mode" data-mode="pinyin"><strong>Pinyin quiz</strong><span class="small">See the characters and type the pinyin.</span></button>
         </div>
         <details class="voice-details"><summary>Voice &amp; speed</summary><div class="audio-settings"><label for="voice">Mandarin voice</label><select id="voice"><option>Loading voices…</option></select><label for="speed">Speaking speed</label><div class="speed-row"><input id="speed" type="range" min="0.5" max="1.2" step="0.05" value="0.9"><output id="speedValue">0.9×</output></div><button id="testVoice" class="ghost" type="button"><svg class="btn-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>Preview voice</button><div id="voiceStatus" class="audio-status" role="status"></div></div>
         </details><div class="toggles"><label><input id="shuffle" type="checkbox"> Shuffle words</label><label><input id="strict" type="checkbox" checked> Check tones</label></div>
@@ -37,7 +38,7 @@
       <div class="word-workspace">
         <section class="word-editor" aria-label="Add words">
         <div class="photo-import">
-          <div><h2>From a page to your study list</h2><p class="note">Photograph printed Chinese or choose an image. Words and pinyin are added automatically.</p></div>
+          <div><h2>Add words from photos</h2><p class="note">Photograph printed Chinese or choose an image. Words and pinyin are added automatically.</p></div>
           <div class="photo-actions"><button id="takePhoto" class="secondary" type="button">Take a photo</button><button id="phoneImport" class="secondary" type="button">Use phone camera</button><button id="uploadPhoto" class="secondary" type="button">Choose photos</button></div>
           <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden>
           <input id="photoInput" type="file" accept="image/*" multiple hidden>

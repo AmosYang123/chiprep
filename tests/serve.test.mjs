@@ -9,7 +9,7 @@ const base='http://127.0.0.1:'+server.address().port;
 const get=path=>fetch(base+path);
 
 test('serves the app with module-friendly content types',async()=>{
-  for(const [path,type] of [['/','text/html'],['/phone','text/html'],['/phone.html','text/html'],['/phone-upload.js','text/javascript'],['/vendor/phone/qrcode.mjs','text/javascript'],['/app.js','text/javascript'],['/glass.css','text/css'],['/vendor/pinyin-pro.mjs','text/javascript']]){
+  for(const [path,type] of [['/','text/html'],['/phone','text/html'],['/phone.html','text/html'],['/phone-upload.js','text/javascript'],['/vendor/phone/qrcode.mjs','text/javascript'],['/app.js','text/javascript'],['/theme.css','text/css'],['/theme.js','text/javascript'],['/vendor/pinyin-pro.mjs','text/javascript']]){
     const res=await get(path);
     assert.equal(res.status,200,path+' should be served');
     assert.equal(res.headers.get('content-type'),type,path+' needs the right type to load as a module');

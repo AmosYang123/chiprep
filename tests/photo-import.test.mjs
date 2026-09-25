@@ -19,9 +19,9 @@ async function harness(recognize){
   const dom=new JSDOM(await readFile(new URL('../dist/index.html',import.meta.url),'utf8'));
   const get=id=>dom.window.document.getElementById(id);
   let value='你好|custom',busy=false;
-  setupPhotoImport({camera:get('takePhoto'),upload:get('uploadPhoto'),cameraInput:get('cameraInput'),photoInput:get('photoInput'),language:get('photoLanguage'),status:get('photoStatus'),getValue:()=>value,setValue:next=>{value=next},beforeStart(){},onBusy:next=>{busy=next},recognize});
+  const importFile=setupPhotoImport({camera:get('takePhoto'),upload:get('uploadPhoto'),cameraInput:get('cameraInput'),photoInput:get('photoInput'),language:get('photoLanguage'),status:get('photoStatus'),getValue:()=>value,setValue:next=>{value=next},beforeStart(){},onBusy:next=>{busy=next},recognize});
   function select(file={type:'image/png',size:1024}){Object.defineProperty(get('photoInput'),'files',{value:[file],configurable:true});return get('photoInput').onchange()}
-  return {dom,get,select,value:()=>value,busy:()=>busy};
+  return {dom,get,select,importFile,value:()=>value,busy:()=>busy};
 }
 test('import automatically appends, exposes progress, blocks double imports and restores controls',async()=>{
   let resolve,calls=0;
@@ -53,4 +53,17 @@ test('vendored browser OCR exposes the worker factory used by photo import',asyn
     const {default:ocr}=await import('../dist/vendor/ocr/tesseract.esm.min.js');
     assert.equal(typeof ocr.createWorker,'function');
   } finally {delete globalThis.self}
+});
+
+
+test('no Chinese text is a retryable failure, while duplicate words are confirmed with zero added',async()=>{
+  let text='English only';const h=await harness(async()=>text);
+  try{
+    const empty=await h.importFile({type:'image/png',size:10});
+    assert.equal(empty.ok,false);assert.equal(empty.added,0);assert.match(empty.message,/No Chinese words/);assert.equal(h.value(),'你好|custom');
+    text='你好';const duplicate=await h.importFile({type:'image/png',size:10});
+    assert.equal(duplicate.ok,true);assert.equal(duplicate.added,0);assert.match(duplicate.message,/already/);
+    text='朋友';const progress=[];const added=await h.importFile({type:'image/png',size:10},message=>progress.push(message));
+    assert.equal(added.added,1);assert.equal(added.ok,true);assert.ok(progress.length>0);
+  }finally{h.dom.window.close()}
 });

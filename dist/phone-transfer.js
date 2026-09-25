@@ -34,9 +34,11 @@ export function receivePhotos({peer,token,onStatus,onPhoto,onReady,schedule=setT
   let connection=null,stopped=false,processing=false;
   const completed=new Map();
   const stop=()=>{if(stopped)return;stopped=true;unschedule(expiry);unschedule(startup);peer.destroy()};
-  const expiry=schedule(()=>{stop();onStatus('This QR code expired. Create a new code to send more photos.');},SESSION_MS);
+  let expiry;
+  const refreshExpiry=()=>{unschedule(expiry);expiry=schedule(()=>{stop();onStatus('This QR code expired. Create a new code to send more photos.');},SESSION_MS)};
+  refreshExpiry();
   const startup=schedule(()=>{stop();onStatus('Could not connect. Check your internet connection and try again.');},25000);
-  peer.on('open',id=>{if(stopped)return;unschedule(startup);onReady(id);onStatus('Scan with your phone camera. Keep this page open. Code expires in 10 minutes.');});
+  peer.on('open',id=>{if(stopped)return;unschedule(startup);onReady(id);onStatus('Scan with your phone camera. Keep this page open. Code expires after 10 minutes without an upload.');});
   peer.on('error',()=>{stop();onStatus('Connection failed. Try again on the same Wi-Fi, without a VPN.');});
   peer.on('connection',incoming=>{
     if(stopped||incoming.metadata?.token!==token||connection){incoming.on('open',()=>incoming.close());incoming.close();return;}
@@ -49,12 +51,14 @@ export function receivePhotos({peer,token,onStatus,onPhoto,onReady,schedule=setT
       if(!validPhoto(message)){incoming.send({type:'result',id:message?.id,ok:false,message:'Choose a JPG, PNG or WebP photo under 8 MB.'});return;}
       if(completed.has(message.id)){incoming.send(completed.get(message.id));return;}
       if(processing){incoming.send({type:'result',id:message.id,ok:false,message:'The computer is reading another photo. Wait, then upload again.'});return;}
-      processing=true;onStatus('Photo received. Reading words…');
+      refreshExpiry();processing=true;
+      const progress=text=>{if(stopped)return;onStatus(text);if(incoming.open)incoming.send({type:'progress',id:message.id,message:text})};
+      progress('Photo received on computer. Preparing to read words…');
       let result;
-      try{result=await onPhoto(new Blob([message.bytes],{type:message.mime}));}
+      try{result=await onPhoto(new Blob([message.bytes],{type:message.mime}),progress);}
       catch{result={ok:false,message:'Photo received, but could not be read. Try a clearer photo.'};}
-      const reply={type:'result',id:message.id,ok:!!result?.ok,message:result?.message||'Photo received.'};
-      completed.set(message.id,reply);if(completed.size>30)completed.delete(completed.keys().next().value);
+      const reply={type:'result',id:message.id,ok:!!result?.ok,added:Number.isInteger(result?.added)?result.added:0,message:result?.message||'Photo received.'};
+      if(reply.ok)completed.set(message.id,reply);if(completed.size>30)completed.delete(completed.keys().next().value);
       processing=false;
       if(!stopped){onStatus(reply.message);if(incoming.open)incoming.send(reply);}
     });
@@ -62,14 +66,20 @@ export function receivePhotos({peer,token,onStatus,onPhoto,onReady,schedule=setT
   return stop;
 }
 
-export function sendPhoto(connection,file,{timeoutMs=120000,schedule=setTimeout,unschedule=clearTimeout}={}) {
+export function sendPhoto(connection,file,{timeoutMs=45000,maxWaitMs=240000,onProgress=()=>{},id=crypto.randomUUID(),schedule=setTimeout,unschedule=clearTimeout}={}) {
   return new Promise((resolve,reject)=>{
     if(!connection.open){reject(new Error('Computer disconnected. Scan a new QR code.'));return;}
-    const id=crypto.randomUUID();let settled=false;
-    const finish=(error,result)=>{if(settled)return;settled=true;unschedule(timer);connection.off('data',onData);connection.off('close',onClose);connection.off('error',onClose);error?reject(error):resolve(result)};
-    const onData=message=>{if(message?.type==='result'&&message.id===id)finish(null,message)};
+    let settled=false,timer;
+    const finish=(error,result)=>{if(settled)return;settled=true;unschedule(timer);unschedule(deadline);connection.off('data',onData);connection.off('close',onClose);connection.off('error',onClose);error?reject(error):resolve(result)};
+    const resetTimer=()=>{unschedule(timer);timer=schedule(()=>finish(new Error('No confirmation from the computer. Check that its page is open, then retry this photo.')),timeoutMs)};
+    const onData=message=>{
+      if(message?.id!==id)return;
+      if(message.type==='progress'&&typeof message.message==='string'){resetTimer();onProgress(message.message);}
+      if(message.type==='result')finish(null,message);
+    };
     const onClose=()=>finish(new Error('Connection lost. Check your computer before trying again.'));
-    const timer=schedule(()=>finish(new Error('No confirmation yet. Check your computer; the photo may still be processing.')),timeoutMs);
+    const deadline=schedule(()=>finish(new Error('No confirmation after four minutes. Check your computer before retrying this photo.')),maxWaitMs);
+    resetTimer();
     connection.on('data',onData);connection.on('close',onClose);connection.on('error',onClose);
     file.arrayBuffer().then(bytes=>{
       if(settled)return;

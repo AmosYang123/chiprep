@@ -38,9 +38,9 @@
         <section class="word-editor" aria-label="Add words">
         <div class="photo-import">
           <div><h2>From a page to your study list</h2><p class="note">Photograph printed Chinese or choose an image. Words and pinyin are added automatically.</p></div>
-          <div class="photo-actions"><button id="takePhoto" class="secondary" type="button">Take a photo</button><button id="phoneImport" class="secondary" type="button">Use phone camera</button><button id="uploadPhoto" class="secondary" type="button">Choose image</button></div>
+          <div class="photo-actions"><button id="takePhoto" class="secondary" type="button">Take a photo</button><button id="phoneImport" class="secondary" type="button">Use phone camera</button><button id="uploadPhoto" class="secondary" type="button">Choose photos</button></div>
           <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden>
-          <input id="photoInput" type="file" accept="image/*" hidden>
+          <input id="photoInput" type="file" accept="image/*" multiple hidden>
           <label class="photo-language" for="photoLanguage">Photo text <select id="photoLanguage"><option value="chi_sim">Simplified Chinese</option><option value="chi_tra">Traditional Chinese</option></select></label>
           <p id="photoStatus" class="note" role="status" aria-live="polite">Photos stay on your device. First use downloads the text reader.</p>
         </div>
@@ -90,6 +90,7 @@
     <div class="phone-dialog-head"><h2 id="phoneTitle">Send photos from your phone</h2><button id="closePhone" class="ghost" type="button">Close</button></div>
     <p class="note">Scan this code with your phone camera, take a photo, then tap Upload to computer. Your computer will add the words automatically.</p>
     <img id="phoneQR" alt="Scan to connect your phone" hidden>
+    <p id="phoneImportSummary" class="phone-import-summary" hidden role="status"></p>
     <p id="phoneConnectionStatus" role="status" aria-live="polite"></p>
     <a id="phoneLink" hidden target="_blank" rel="noopener noreferrer">Open phone upload page</a>
     <button id="newPhoneCode" class="secondary" type="button">Create new code</button>

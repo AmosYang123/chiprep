@@ -58,3 +58,25 @@ test('sender handles disconnects, invalid photos and acknowledgement timeouts',a
   let timeout;const pending=sendPhoto(c,new Blob(['x'],{type:'image/jpeg'}),{schedule:fn=>{timeout=fn;return 1},unschedule(){}});
   await tick();timeout();await assert.rejects(pending,/No confirmation/);assert.equal(c.listenerCount('data'),0);
 });
+
+test('phone gets receipt and recognition progress before the final word count',async()=>{
+  let finish,report;
+  const h=setup((blob,progress)=>{report=progress;return new Promise(resolve=>{finish=resolve})});
+  const c=new Connection();h.peer.emit('connection',c);c.emit('open');c.emit('data',photo());
+  try{
+    assert.equal(c.sent.at(-1).type,'progress');
+    assert.match(c.sent.at(-1).message,/received/i);
+    report('Reading words… 50%');assert.match(c.sent.at(-1).message,/50%/);
+    finish({ok:true,message:'Added 3 words.',added:3});await tick();
+    assert.equal(c.sent.at(-1).added,3);assert.equal(c.sent.at(-1).type,'result');
+  }finally{finish?.({ok:false});h.stop()}
+});
+test('matching progress resets the inactivity timeout without implying completion',async()=>{
+  const c=new Connection(),updates=[],timers=new Map();let key=0;
+  const pending=sendPhoto(c,new Blob(['x'],{type:'image/jpeg'}),{onProgress:m=>updates.push(m),schedule:fn=>{timers.set(++key,fn);return key},unschedule:k=>timers.delete(k)});
+  await tick();const id=c.sent[0].id;
+  try{
+    const before=key;c.emit('data',{type:'progress',id,message:'Photo received. Reading words…'});
+    assert.equal(updates.length,1);assert.ok(key>before);assert.equal(timers.size,2,'inactivity timer plus absolute deadline');
+  }finally{c.emit('data',{type:'result',id,ok:true,added:2});await pending}
+});

@@ -1,3 +1,5 @@
+import {setupPhoneReceiver} from './phone-receiver.js';
+import {setupPhotoImport} from './photo-import.js';
 import {parseWords,matchesPinyin,mandarinVoices} from './study-core.js';
 import {withPinyin, setupDictation, formatStudyList} from './dictation.js';
 import {createRound, rateWord, groupWords, wordKey, selectedWords} from './practice.js';
@@ -196,6 +198,13 @@ const cancelDictation=setupDictation({
   onBusy:busy=>{$('#start').disabled=busy;$('#testVoice').disabled=busy||!voices.length},
   append:words=>{const prior=$('#words').value.trimEnd();$('#words').value=(prior?prior+'\n':'')+withPinyin(words.join('\n'));$('#words').oninput()}
 });
+const importPhoto=setupPhotoImport({
+  camera:$('#takePhoto'),upload:$('#uploadPhoto'),cameraInput:$('#cameraInput'),photoInput:$('#photoInput'),language:$('#photoLanguage'),status:$('#photoStatus'),
+  getValue:()=>$('#words').value,setValue:value=>{$('#words').value=value;$('#words').oninput()},
+  beforeStart:()=>{cancelDictation();stop()},
+  onBusy:busy=>{for(const id of ['#start','#dictate','#openReview','#openRemembered'])$(id).disabled=busy;if(!busy){updateSummary();$('#dictate').disabled=!(window.SpeechRecognition||window.webkitSpeechRecognition)}}
+});
+setupPhoneReceiver({button:$('#phoneImport'),importPhoto,beforeReceive:()=>{if($('#study').classList.contains('active'))back()}});
 window.addEventListener('pagehide',cancelDictation);
 $('#speed').oninput=()=>{$('#speedValue').textContent=Number($('#speed').value).toFixed(2).replace(/0$/,'')+'×'};
 $('#testVoice').onclick=()=>speak('你好，我们一起学习中文。');

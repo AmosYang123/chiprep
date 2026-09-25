@@ -11,7 +11,7 @@ const types={'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript
 
 const app=createServer(async(req,res)=>{
   const path=decodeURIComponent(new URL(req.url,'http://x').pathname);
-  const rel=normalize(path==='/'?'index.html':path.slice(1));
+  const rel=normalize(path==='/'?'index.html':path==='/phone'?'phone.html':path.slice(1));
   if(rel.startsWith('..')){res.writeHead(403).end('Forbidden');return}
   try{
     const body=await readFile(join(root,rel));

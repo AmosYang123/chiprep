@@ -22,7 +22,7 @@ const block=(all,match)=>{const found=all.find(rule=>rule.prelude.includes(match
 test('glass stylesheet loads after the base styles it re-skins',async()=>{
   const html=await read('index.html');
   const sheets=[...html.matchAll(/<link rel="stylesheet" href="([^"]+)"/g)].map(m=>m[1]);
-  assert.deepEqual(sheets,['polish.css','input.css','glass.css']);
+  assert.deepEqual(sheets,['polish.css','input.css','glass.css','workspace.css']);
 });
 
 test('surfaces use the real material: blurred and saturated backdrop, both prefixes',async()=>{

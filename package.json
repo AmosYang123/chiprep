@@ -9,7 +9,10 @@
     "vendor": "node scripts/vendor.mjs"
   },
   "dependencies": {
-    "pinyin-pro": "3.29.4"
+    "peerjs": "1.5.5",
+    "pinyin-pro": "3.29.4",
+    "qrcode-generator": "2.0.4",
+    "tesseract.js": "6.0.1"
   },
   "devDependencies": {
     "jsdom": "^30.1.0"

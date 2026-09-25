@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="referrer" content="no-referrer">
+  <title>Send a photo · Tīng</title>
+  <link rel="stylesheet" href="polish.css"><link rel="stylesheet" href="workspace.css">
+</head>
+<body class="phone-page">
+  <main class="phone-upload">
+    <div class="brand"><span class="mark">听</span> Tīng</div>
+    <h1>Paper to practice.</h1><p>Take a clear photo of your Chinese words. Upload it to your computer to add them to your study list.</p>
+    <p id="connectionStatus" role="status" aria-live="polite">Connecting to your computer…</p>
+    <div class="photo-actions"><button id="capture" class="secondary" type="button" disabled>Take a photo</button><button id="choose" class="secondary" type="button" disabled>Choose image</button></div>
+    <input id="captureFile" type="file" accept="image/*" capture="environment" hidden>
+    <input id="chooseFile" type="file" accept="image/*" hidden>
+    <img id="preview" alt="Photo ready to send" hidden>
+    <button id="send" class="primary" type="button" disabled>Upload to computer</button>
+    <p id="uploadStatus" role="status" aria-live="polite">Keep this page and the computer’s QR panel open until the upload is confirmed.</p>
+    <p class="note">Photograph one page at a time, in good light. You can send another photo after each upload. If you cannot connect, try putting both devices on the same Wi-Fi.</p>
+  </main>
+  <script type="module" src="phone-upload.js"></script>
+</body>
+</html>

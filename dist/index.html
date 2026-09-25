@@ -14,14 +14,36 @@
   <link rel="stylesheet" href="polish.css">
   <link rel="stylesheet" href="input.css">
   <link rel="stylesheet" href="glass.css">
+  <link rel="stylesheet" href="workspace.css">
 </head>
 <body>
   <main class="shell">
     <header class="topbar"><div class="brand"><span class="mark">听</span> Tīng</div><span class="small top">Chinese listening practice</span></header>
     <section id="setup" class="setup">
-      <div>
-        <h1>Chinese practice</h1>
-        <p class="lede">Add your words. Work through them at your own pace.</p>
+      <header class="workspace-heading"><div><h1>Your words, your practice.</h1><p class="lede">Bring a page of Chinese. Leave knowing a little more.</p></div><span class="workspace-stamp" lang="zh-CN" aria-hidden="true">学</span></header>
+      <aside class="panel session-panel" aria-label="Practice settings">
+        <label class="field-label">Choose a study mode</label>
+        <div class="mode-grid">
+          <button class="mode active" data-mode="listen"><strong>Listening recall</strong><span class="small">Listen with the word hidden. Reveal it to check, then decide if you know it.</span></button>
+          <button class="mode" data-mode="pinyin"><strong>Pinyin quiz</strong><span class="small">See and hear the characters, then type the pinyin.</span></button>
+        </div>
+        <details class="voice-details"><summary>Voice &amp; speed</summary><div class="audio-settings"><label for="voice">Mandarin voice</label><select id="voice"><option>Loading voices…</option></select><label for="speed">Speaking speed</label><div class="speed-row"><input id="speed" type="range" min="0.5" max="1.2" step="0.05" value="0.9"><output id="speedValue">0.9×</output></div><button id="testVoice" class="ghost" type="button"><svg class="btn-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>Preview voice</button><div id="voiceStatus" class="audio-status" role="status"></div></div>
+        </details><div class="toggles"><label><input id="shuffle" type="checkbox"> Shuffle words</label><label><input id="strict" type="checkbox" checked> Check tones</label></div>
+        <button id="start" class="primary">Start listening</button>
+        <p id="setupError" class="empty-error" role="alert"></p>
+        <p class="note">Audio uses the Mandarin voice installed in your browser. Turn your volume on before starting.</p>
+
+      </aside>
+      <div class="word-workspace">
+        <section class="word-editor" aria-label="Add words">
+        <div class="photo-import">
+          <div><h2>From a page to your study list</h2><p class="note">Photograph printed Chinese or choose an image. Words and pinyin are added automatically.</p></div>
+          <div class="photo-actions"><button id="takePhoto" class="secondary" type="button">Take a photo</button><button id="phoneImport" class="secondary" type="button">Use phone camera</button><button id="uploadPhoto" class="secondary" type="button">Choose image</button></div>
+          <input id="cameraInput" type="file" accept="image/*" capture="environment" hidden>
+          <input id="photoInput" type="file" accept="image/*" hidden>
+          <label class="photo-language" for="photoLanguage">Photo text <select id="photoLanguage"><option value="chi_sim">Simplified Chinese</option><option value="chi_tra">Traditional Chinese</option></select></label>
+          <p id="photoStatus" class="note" role="status" aria-live="polite">Photos stay on your device. First use downloads the text reader.</p>
+        </div>
         <label class="field-label" for="words">Study list <span class="hint">· one item per line</span></label>
         <div class="list-actions"><button id="dictate" class="secondary" type="button" aria-pressed="false">Dictate words</button><button id="formatList" class="secondary" type="button">Split into words</button><button id="fillPinyin" class="secondary" type="button">Add missing pinyin</button></div>
         <p id="dictationStatus" class="note" role="status">Speak Mandarin. Recognized words are split onto separate lines with pinyin. Your browser may send audio to its speech service for transcription.</p>
@@ -30,24 +52,17 @@
 学习|xué xí
 图书馆|tú shū guǎn
 明天|míng tiān</textarea>
-        <div id="picker" class="picker" role="group" aria-labelledby="pickTitle" hidden><div class="picker-head"><span id="pickTitle" class="field-label">Words to study <span id="pickCount" class="hint"></span></span><div class="picker-actions"><button id="pickAll" class="ghost" type="button">Select all</button><button id="pickNone" class="ghost" type="button">Clear</button></div></div><div id="pickList" class="pick-list"></div></div>
+
         <p class="note">Pinyin is filled in automatically when you finish editing. You can change any reading after <b>|</b>. Check names and words with multiple readings: context can change the pronunciation.</p>
         <details class="tone-help"><summary>How do I type tones?</summary><p>Type a number after each syllable: <b>ma1 → mā · ma2 → má · ma3 → mǎ · ma4 → mà</b>. Use <b>5</b> or no number for a neutral tone.</p><p>For 你好, type <b>ni3 hao3</b>. For 女, type <b>nv3</b> or <b>nu:3</b>. Tone marks such as <b>nǐ hǎo</b> work too. Turn off “Check tones” to practice without tone numbers.</p></details>
         <div id="review" class="review"><label class="field-label">Check pinyin <span class="hint">· edit anything before you begin</span></label><div id="reviewRows"></div></div>
-      </div>
-      <aside class="panel">
-        <label class="field-label">Choose a study mode</label>
-        <div class="mode-grid">
-          <button class="mode active" data-mode="listen"><strong>Listening recall</strong><span class="small">Listen with the word hidden. Reveal it to check, then decide if you know it.</span></button>
-          <button class="mode" data-mode="pinyin"><strong>Pinyin quiz</strong><span class="small">See and hear the characters, then type the pinyin.</span></button>
-        </div>
-        <div class="audio-settings"><label for="voice">Mandarin voice</label><select id="voice"><option>Loading voices…</option></select><label for="speed">Speaking speed</label><div class="speed-row"><input id="speed" type="range" min="0.5" max="1.2" step="0.05" value="0.9"><output id="speedValue">0.9×</output></div><button id="testVoice" class="ghost" type="button"><svg class="btn-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>Preview voice</button><div id="voiceStatus" class="audio-status" role="status"></div></div>
-        <div class="toggles"><label><input id="shuffle" type="checkbox"> Shuffle words</label><label><input id="strict" type="checkbox" checked> Check tones</label></div>
-        <button id="start" class="primary">Start listening</button>
-        <p id="setupError" class="empty-error" role="alert"></p>
-        <p class="note">Audio uses the Mandarin voice installed in your browser. Turn your volume on before starting.</p>
+        </section>
+        <section class="word-library" aria-label="Your word collection"><h2>Ready to practice</h2><p class="note">Choose the words for your next round.</p>
+        <div id="picker" class="picker" role="group" aria-labelledby="pickTitle" hidden><div class="picker-head"><span id="pickTitle" class="field-label">Words to study <span id="pickCount" class="hint"></span></span><div class="picker-actions"><button id="pickAll" class="ghost" type="button">Select all</button><button id="pickNone" class="ghost" type="button">Clear</button></div></div><div id="pickList" class="pick-list"></div></div>
         <div class="saved-progress"><p id="savedProgress" class="small"></p><div class="group-links"><button id="openReview" class="secondary" type="button">Needs review</button><button id="openRemembered" class="secondary" type="button">Remembered</button></div><p class="note">Open a group to see its words and practice just those. Start tests every word once.</p><button id="resetProgress" class="ghost" type="button">Reset this list’s progress</button></div>
-      </aside>
+        </section>
+      </div>
+
     </section>
 
     <section id="study" class="study">
@@ -71,6 +86,16 @@
       <p class="keyboard-hint">Space to replay · ← previous word · Esc to return to your list</p>
     </section>
   </main>
+  <dialog id="phoneDialog" aria-labelledby="phoneTitle">
+    <div class="phone-dialog-head"><h2 id="phoneTitle">Send photos from your phone</h2><button id="closePhone" class="ghost" type="button">Close</button></div>
+    <p class="note">Scan this code with your phone camera, take a photo, then tap Upload to computer. Your computer will add the words automatically.</p>
+    <img id="phoneQR" alt="Scan to connect your phone" hidden>
+    <p id="phoneConnectionStatus" role="status" aria-live="polite"></p>
+    <a id="phoneLink" hidden target="_blank" rel="noopener noreferrer">Open phone upload page</a>
+    <button id="newPhoneCode" class="secondary" type="button">Create new code</button>
+    <p class="note">Keep both pages open. Anyone with this code can send photos until it expires or you close this panel. A connection service pairs the browsers; photos travel through their encrypted connection. Some networks may block the connection; try the same Wi-Fi.</p>
+  </dialog>
+  <section id="receivedPhotos" class="received-photos" hidden aria-label="Photos received from phone"><h2>Received photos</h2><p class="note">Available until you reload this page. Your extracted words are saved.</p><div id="receivedPhotoList"></div></section>
   <script type="module" src="app.js"></script>
 </body>
 </html>

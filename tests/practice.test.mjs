@@ -1,30 +1,25 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {createPractice, rateWord, wordKey} from '../dist/practice.js';
+import {createRound, rateWord, groupWords, wordKey, selectedWords} from '../dist/practice.js';
 
 const words = [{hanzi:'冬天',pinyin:'dōng tiān'}, {hanzi:'夏天',pinyin:'xià tiān'}];
-test('forgotten words rotate back into practice; remembered words retire', () => {
-  const initial = createPractice(words);
-  const again = rateWord(initial, false);
-  assert.deepEqual(again.queue, [words[1], words[0]]);
-  assert.equal(again.learned.length, 0);
-  const learned = rateWord(again, true);
-  assert.deepEqual(learned.queue, [words[0]]);
-  assert.deepEqual(learned.learned, [wordKey(words[1])]);
-  const done = rateWord(learned, true);
-  assert.equal(done.queue.length, 0);
-  assert.equal(done.learned.length, 2);
+test('a round tests every word exactly once, forgotten or not', () => {
+  const round = createRound([...words, words[0]]);
+  assert.equal(round.total, 2);
+  const first = rateWord(round, false);
+  assert.deepEqual(first.queue, [words[1]]);
+  const done = rateWord(first, true);
+  assert.deepEqual(done.queue, []);
+  assert.deepEqual(done.results, [{word:words[0],remembered:false},{word:words[1],remembered:true}]);
   assert.equal(rateWord(done, false), done);
-  assert.deepEqual(initial.queue, words);
 });
-test('a lone forgotten word remains and can later be memorized', () => {
-  const practice = createPractice([words[0]]);
-  assert.deepEqual(rateWord(practice,false),practice);
-  assert.equal(rateWord(rateWord(practice,false),true).queue.length,0);
+test('words split into review and remembered groups; edited readings need review', () => {
+  assert.deepEqual(groupWords(words,[wordKey(words[1])]),{review:[words[0]],remembered:[words[1]]});
+  const changed = {...words[1],pinyin:'xià tian'};
+  assert.deepEqual(groupWords([changed],[wordKey(words[1])]).review,[changed]);
 });
-test('saved progress resumes, duplicates collapse and edited readings return', () => {
-  const saved = [wordKey(words[0])];
-  assert.deepEqual(createPractice([...words, words[0]],saved),{total:2,learned:saved,queue:[words[1]]});
-  const changed = {...words[0],pinyin:'dōng tian'};
-  assert.deepEqual(createPractice([changed],saved).queue,[changed]);
+test('selected words drop the skipped characters, whatever their reading', () => {
+  assert.deepEqual(selectedWords(words, ['夏天']), [words[0]]);
+  assert.deepEqual(selectedWords([{hanzi:'夏天',pinyin:''}], ['夏天']), []);
+  assert.deepEqual(selectedWords(words), words);
 });

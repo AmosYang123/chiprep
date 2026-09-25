@@ -56,7 +56,7 @@ export function setupDictation({Recognition, button, status, append, beforeStart
     const current = recognition;
     recognition = null;
     current.abort();
-    button.textContent = 'Speak words';
+    button.textContent = 'Dictate words';
     button.setAttribute('aria-pressed','false');
     onBusy(false);
   }
@@ -67,8 +67,8 @@ export function setupDictation({Recognition, button, status, append, beforeStart
     recognition = current;
     current.lang='zh-CN';current.continuous=true;current.interimResults=true;
     let added=0,failed=false;
-    button.textContent='Stop listening';button.setAttribute('aria-pressed','true');onBusy(true);
-    status.textContent='Listening in Mandarin… Words are split into separate lines automatically. Press Stop when finished.';
+    button.textContent='Stop dictating';button.setAttribute('aria-pressed','true');onBusy(true);
+    status.textContent='Listening in Mandarin… Words are split into separate lines automatically. Press Stop dictating when you are done.';
     current.onresult = event => {
       if (recognition !== current) return;
       let preview='';
@@ -85,7 +85,7 @@ export function setupDictation({Recognition, button, status, append, beforeStart
       const messages={'not-allowed':'Microphone access was denied. Allow it in your browser’s site settings and try again.','audio-capture':'No microphone is available. Connect a microphone and try again.','network':'Transcription could not connect. Check your connection or try Chrome.','no-speech':'No speech detected. Try again and speak clearly.','service-not-allowed':'This browser cannot use speech recognition here. Try Chrome or keyboard dictation.','language-not-supported':'Mandarin dictation is unavailable in this browser. Try Chrome.'};
       status.textContent=messages[event.error]||'Dictation stopped. You can try again; your list is saved.';
     };
-    current.onend=()=>{if(recognition!==current)return;recognition=null;button.disabled=false;button.textContent='Speak words';button.setAttribute('aria-pressed','false');onBusy(false);if(!failed)status.textContent=added?'Added '+added+' items with pinyin. Check the transcription and readings below.':'No words added. Try again and speak clearly.';};
+    current.onend=()=>{if(recognition!==current)return;recognition=null;button.disabled=false;button.textContent='Dictate words';button.setAttribute('aria-pressed','false');onBusy(false);if(!failed)status.textContent=added?'Added '+added+' items with pinyin. Check the transcription and readings below.':'No words added. Try again and speak clearly.';};
     try {current.start();} catch {status.textContent='Could not start dictation. Try again or use keyboard dictation.';cancel();}
   };
   return cancel;

@@ -2,3 +2,6 @@ node_modules/
 .sites-runtime/
 *.tmp
 .env*
+.vercel
+.DS_Store
+

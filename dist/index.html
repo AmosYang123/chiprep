@@ -3,12 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f4f4f1">
+  <meta name="theme-color" content="#f4f1ea">
   <meta name="description" content="A focused Chinese listening and pinyin study tool.">
   <title>Tīng · Chinese listening practice</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='5' fill='%23334c61'/%3E%3Cpath d='M18 27h10l12-10v30L28 37H18z' fill='white'/%3E%3Cpath d='M45 24c5 5 5 11 0 16' fill='none' stroke='white' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='5' fill='%232f4a60'/%3E%3Cpath d='M18 27h10l12-10v30L28 37H18z' fill='white'/%3E%3Cpath d='M45 24c5 5 5 11 0 16' fill='none' stroke='white' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Tīng · Chinese listening practice">
+  <meta property="og:description" content="Add your own Chinese words, hear them spoken, and practise until you know them by ear.">
+  <meta name="twitter:card" content="summary">
   <link rel="stylesheet" href="polish.css">
   <link rel="stylesheet" href="input.css">
+  <link rel="stylesheet" href="glass.css">
 </head>
 <body>
   <main class="shell">
@@ -18,13 +23,14 @@
         <h1>Chinese practice</h1>
         <p class="lede">Add your words. Work through them at your own pace.</p>
         <label class="field-label" for="words">Study list <span class="hint">· one item per line</span></label>
-        <div class="list-actions"><button id="dictate" class="secondary" type="button" aria-pressed="false">Speak words</button><button id="formatList" class="secondary" type="button">Smart format list</button><button id="fillPinyin" class="secondary" type="button">Add missing pinyin</button></div>
+        <div class="list-actions"><button id="dictate" class="secondary" type="button" aria-pressed="false">Dictate words</button><button id="formatList" class="secondary" type="button">Split into words</button><button id="fillPinyin" class="secondary" type="button">Add missing pinyin</button></div>
         <p id="dictationStatus" class="note" role="status">Speak Mandarin. Recognized words are split onto separate lines with pinyin. Your browser may send audio to its speech service for transcription.</p>
         <textarea id="words" class="entry" spellcheck="false" placeholder="你好&#10;朋友&#10;学习&#10;图书馆|tú shū guǎn">你好|nǐ hǎo
 朋友|péng you
 学习|xué xí
 图书馆|tú shū guǎn
 明天|míng tiān</textarea>
+        <div id="picker" class="picker" role="group" aria-labelledby="pickTitle" hidden><div class="picker-head"><span id="pickTitle" class="field-label">Words to study <span id="pickCount" class="hint"></span></span><div class="picker-actions"><button id="pickAll" class="ghost" type="button">Select all</button><button id="pickNone" class="ghost" type="button">Clear</button></div></div><div id="pickList" class="pick-list"></div></div>
         <p class="note">Pinyin is filled in automatically when you finish editing. You can change any reading after <b>|</b>. Check names and words with multiple readings: context can change the pronunciation.</p>
         <details class="tone-help"><summary>How do I type tones?</summary><p>Type a number after each syllable: <b>ma1 → mā · ma2 → má · ma3 → mǎ · ma4 → mà</b>. Use <b>5</b> or no number for a neutral tone.</p><p>For 你好, type <b>ni3 hao3</b>. For 女, type <b>nv3</b> or <b>nu:3</b>. Tone marks such as <b>nǐ hǎo</b> work too. Turn off “Check tones” to practice without tone numbers.</p></details>
         <div id="review" class="review"><label class="field-label">Check pinyin <span class="hint">· edit anything before you begin</span></label><div id="reviewRows"></div></div>
@@ -35,33 +41,34 @@
           <button class="mode active" data-mode="listen"><strong>Listening recall</strong><span class="small">Listen with the word hidden. Reveal it to check, then decide if you know it.</span></button>
           <button class="mode" data-mode="pinyin"><strong>Pinyin quiz</strong><span class="small">See and hear the characters, then type the pinyin.</span></button>
         </div>
-        <div class="audio-settings"><label for="voice">Mandarin voice</label><select id="voice"><option>Loading voices…</option></select><label for="speed">Speaking speed</label><div class="speed-row"><input id="speed" type="range" min="0.5" max="1.2" step="0.05" value="0.9"><output id="speedValue">0.9×</output></div><button id="testVoice" class="ghost" type="button">▷ Preview voice</button><div id="voiceStatus" class="audio-status" role="status"></div></div>
+        <div class="audio-settings"><label for="voice">Mandarin voice</label><select id="voice"><option>Loading voices…</option></select><label for="speed">Speaking speed</label><div class="speed-row"><input id="speed" type="range" min="0.5" max="1.2" step="0.05" value="0.9"><output id="speedValue">0.9×</output></div><button id="testVoice" class="ghost" type="button"><svg class="btn-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"/></svg>Preview voice</button><div id="voiceStatus" class="audio-status" role="status"></div></div>
         <div class="toggles"><label><input id="shuffle" type="checkbox"> Shuffle words</label><label><input id="strict" type="checkbox" checked> Check tones</label></div>
-        <div class="saved-progress"><p id="savedProgress" class="small"></p><p class="note">Memorized words leave the queue. Words you’re still learning come back for another try.</p><button id="resetProgress" class="ghost" type="button">Reset this list’s progress</button></div>
         <button id="start" class="primary">Start listening</button>
         <p id="setupError" class="empty-error" role="alert"></p>
         <p class="note">Audio uses the Mandarin voice installed in your browser. Turn your volume on before starting.</p>
+        <div class="saved-progress"><p id="savedProgress" class="small"></p><div class="group-links"><button id="openReview" class="secondary" type="button">Needs review</button><button id="openRemembered" class="secondary" type="button">Remembered</button></div><p class="note">Open a group to see its words and practice just those. Start tests every word once.</p><button id="resetProgress" class="ghost" type="button">Reset this list’s progress</button></div>
       </aside>
     </section>
 
     <section id="study" class="study">
-      <div class="study-head"><button id="back" class="ghost">← Edit list</button><span id="counter" class="small"></span></div>
-      <div id="progressMeter" class="progress" role="progressbar" aria-label="Words memorized" aria-valuemin="0" aria-valuemax="1" aria-valuenow="0"><i id="bar"></i></div>
+      <div class="study-head"><div class="study-nav"><button id="back" class="ghost"><svg class="btn-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 6l-6 6 6 6"/></svg>Edit list</button><button id="groups" class="ghost" type="button">See word groups</button></div><span id="counter" class="small"></span></div>
+      <div id="progressMeter" class="progress" role="progressbar" aria-label="Words tested this round" aria-valuemin="0" aria-valuemax="1" aria-valuenow="0"><i id="bar"></i></div>
       <div class="panel stage">
         <div id="prompt" class="eyebrow">Listen closely</div>
         <div id="visual"></div>
         <input id="answer" class="answer" aria-label="Your pinyin answer" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Pinyin: nǐ hǎo or ni3 hao3">
         <div id="feedback" class="feedback" aria-live="polite"></div>
         <div class="controls">
-          <button id="replay" class="secondary">↻ Play again</button>
+          <button id="previous" class="ghost" disabled><svg class="btn-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 6l-6 6 6 6"/></svg>Previous word</button>
+          <button id="replay" class="secondary"><svg class="btn-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4.5V9.5h-5"/></svg>Play again</button>
           <button id="reveal" class="secondary">Reveal word</button>
           <button id="check" class="secondary">Check answer</button>
-          <button id="next" class="secondary">Keep practicing</button>
-          <button id="memorized" class="next" hidden>Memorized</button>
+          <button id="next" class="secondary">Needs review</button>
+          <button id="memorized" class="next" hidden>Remembered</button>
         </div>
       </div>
       <p class="playback-hint">No sound yet? Click <strong>Play again</strong>. You may need to try a few times—wait a moment between clicks.</p>
-      <p class="keyboard-hint">Space to replay · Esc to return to your list</p>
+      <p class="keyboard-hint">Space to replay · ← previous word · Esc to return to your list</p>
     </section>
   </main>
   <script type="module" src="app.js"></script>

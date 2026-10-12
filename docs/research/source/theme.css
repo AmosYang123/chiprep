@@ -1,0 +1,121 @@
+/* Color palette:
+   Dark mode: Black and dark gray
+   Light mode: White and light gray
+*/
+:root {
+  color-scheme: light;
+  --paper: #ffffff;
+  --card: #f8f9fa;
+  --soft: #f1f2f4;
+  --line: #e4e4e7;
+  --edge: #a1a1aa;
+  --ink: #09090b;
+  --muted: #64748b;
+  --accent: #18181b;
+  --accent-deep: #000000;
+  --accent-ink: #ffffff;
+  --red: #dc2626;
+  --green: #16a34a;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.09);
+  --font-display: var(--font-body);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #000000;
+  --card: #111113;
+  --soft: #1a1a1e;
+  --line: #26262a;
+  --edge: #4a4a52;
+  --ink: #f4f4f6;
+  --muted: #9ca3af;
+  --accent: #ffffff;
+  --accent-deep: #e4e4e7;
+  --accent-ink: #000000;
+  --red: #f87171;
+  --green: #4ade80;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.6);
+  --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 16px 36px rgba(0, 0, 0, 0.85);
+}
+
+::selection {
+  background: var(--line);
+  color: var(--ink);
+}
+
+/* Theme selector in header */
+.theme-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.theme-control select {
+  min-height: 38px;
+  padding: 6px 28px 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background-color: var(--card);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  transition: border-color var(--dur, 0.18s) ease, background-color var(--dur, 0.18s) ease;
+}
+
+.theme-control select:hover {
+  border-color: var(--edge);
+}
+
+.theme-control select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.header-tools {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.phone-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.feedback.bad {
+  color: var(--red);
+  font-weight: 600;
+}
+
+.feedback.good {
+  color: var(--green);
+  font-weight: 600;
+}
+
+.list-actions button[aria-pressed="true"] {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: var(--accent);
+}
+
+@media (max-width: 700px) {
+  .theme-control > span {
+    display: none;
+  }
+  .header-tools {
+    gap: 10px;
+  }
+}

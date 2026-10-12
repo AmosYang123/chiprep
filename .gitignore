@@ -1,7 +1,9 @@
 node_modules/
-.sites-runtime/
-*.tmp
+dist/
+.astro/
 .env*
-.vercel
+data/
+.sites-runtime/
+.vercel/
+*.tmp
 .DS_Store
-

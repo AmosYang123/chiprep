@@ -1,0 +1,32 @@
+{
+  "mobile": {
+    "width": 390,
+    "scrollWidth": 390
+  },
+  "layout": [
+    {
+      "selector": "shell",
+      "width": "390px",
+      "columns": "none",
+      "padding": "0px 16px 32px"
+    },
+    {
+      "selector": "panel session-panel",
+      "width": "358px",
+      "columns": "194.781px 121.219px",
+      "padding": "14px"
+    },
+    {
+      "selector": "word-workspace",
+      "width": "358px",
+      "columns": "358px",
+      "padding": "0px"
+    },
+    {
+      "selector": "pick-list",
+      "width": "358px",
+      "columns": "174px 174px",
+      "padding": "0px"
+    }
+  ]
+}

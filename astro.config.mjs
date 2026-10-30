@@ -1,10 +1,10 @@
 import { defineConfig } from 'astro/config';
-import node from '@astrojs/node';
+import vercel from '@astrojs/vercel';
 import { networkInterfaces } from 'node:os';
 
 export default defineConfig({
   output: 'server',
-  adapter: node({ mode: 'standalone', bodySizeLimit: 262144 }),
+  adapter: vercel(),
   security: {
     allowedDomains: ['localhost', '127.0.0.1', ...Object.values(networkInterfaces()).flatMap(interfaces => interfaces || []).filter(network => network.family === 'IPv4' && !network.internal).map(network => network.address)].map(hostname => ({ hostname, protocol: 'http', port: '4322' })),
   },

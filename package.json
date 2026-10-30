@@ -10,7 +10,7 @@
     "start": "node scripts/start.mjs"
   },
   "dependencies": {
-    "@astrojs/node": "^11.1.7",
+    "@astrojs/vercel": "^11.0.17",
     "astro": "^7.2.4",
     "better-sqlite3": "^13.0.3",
     "peerjs": "^1.5.5",

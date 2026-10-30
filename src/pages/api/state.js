@@ -3,8 +3,12 @@ import { join } from 'node:path';
 import { openDatabase } from '../../server/db.js';
 import { handleState } from '../../server/state.js';
 
-mkdirSync(join(process.cwd(), 'data'), { recursive: true });
-const database = openDatabase(join(process.cwd(), 'data', 'ting.sqlite'));
+// Vercel functions have a read-only deployment filesystem; /tmp is the only
+// writable location. Browser recovery remains the durable fallback because a
+// serverless instance's /tmp storage is intentionally ephemeral.
+const dataDirectory = process.env.VERCEL ? '/tmp/ting' : join(process.cwd(), 'data');
+mkdirSync(dataDirectory, { recursive: true });
+const database = openDatabase(join(dataDirectory, 'ting.sqlite'));
 
 export async function ALL({ request }) {
   try { return await handleState(request, database); }

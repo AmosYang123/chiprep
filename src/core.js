@@ -47,7 +47,10 @@ export function addPhotoText(current, text) {
 
 export function addDictationText(current, text) {
   const prior = new Set(parseList(current).map(word => word.hanzi));
-  // Speech pauses and punctuation delimit entries; splitting compounds can change the intended word.
-  const added = [...new Set(text.match(/\p{Script=Han}+/gu) || [])].filter(hanzi => !prior.has(hanzi));
+  // A finalized speech-recognition result represents one pause-delimited entry.
+  // Keep the whole term or phrase together; only remove recognition punctuation
+  // and spacing between the Chinese characters.
+  const phrase = (text.match(/\p{Script=Han}+/gu) || []).join('');
+  const added = phrase && !prior.has(phrase) ? [phrase] : [];
   return { added: added.length, value: [current.trimEnd(), ...added.map(hanzi => { const word = parseList(hanzi)[0]; return `${word.hanzi}|${word.pinyin}`; })].filter(Boolean).join('\n') };
 }

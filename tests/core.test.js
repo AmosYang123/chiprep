@@ -38,9 +38,10 @@ test('automatic readings use phrase context and preserve explicit corrections', 
   assert.equal(parseList('银行|custom reading')[0].pinyin, 'custom reading');
 });
 
-test('dictation keeps word boundaries, ignores punctuation and retains corrections', () => {
-  const result = addDictationText('朋友|péng you', '朋友，图书馆。明天！图书馆');
-  assert.equal(result.added, 2);
-  assert.equal(result.value, '朋友|péng you\n图书馆|tú shū guǎn\n明天|míng tiān');
+test('each finalized dictation result stays together as one pause-delimited phrase', () => {
+  const result = addDictationText('朋友|péng you', '我想，去图书馆。');
+  assert.equal(result.added, 1);
+  assert.equal(result.value, '朋友|péng you\n我想去图书馆|wǒ xiǎng qù tú shū guǎn');
+  assert.deepEqual(addDictationText(result.value, '我想去图书馆'), { added: 0, value: result.value });
   assert.deepEqual(addDictationText(result.value, '... 123 hello'), { added: 0, value: result.value });
 });

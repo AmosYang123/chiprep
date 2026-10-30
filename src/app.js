@@ -583,7 +583,7 @@ $('#dictate').onclick = () => {
         interim = transcript;
       }
     }
-    $('#dictationStatus').textContent = interim ? `Hearing: ${interim}` : heard ? `Added ${heard} words. Keep speaking, or stop dictation.` : 'Listening… Speak Mandarin.';
+    $('#dictationStatus').textContent = interim ? `Hearing: ${interim}` : heard ? `Added ${heard} pause-separated ${heard === 1 ? 'line' : 'lines'}. Keep speaking, or stop dictation.` : 'Listening… Speak Mandarin.';
   };
   session.onerror = event => {
     if (recognition !== session) return;
@@ -597,13 +597,13 @@ $('#dictate').onclick = () => {
     $('#dictate').textContent = 'Dictate words';
     $('#dictate').setAttribute('aria-pressed', 'false');
     $('#start').disabled = photoBusy;
-    if (!failed) $('#dictationStatus').textContent = heard ? `Dictation finished. Added ${heard} words.` : 'Dictation finished. No new words were added.';
+    if (!failed) $('#dictationStatus').textContent = heard ? `Dictation finished. Added ${heard} ${heard === 1 ? 'line' : 'lines'}.` : 'Dictation finished. No new lines were added.';
   };
   try {
     session.start();
     $('#dictate').textContent = 'Stop dictation';
     $('#dictate').setAttribute('aria-pressed', 'true');
-    $('#dictationStatus').textContent = 'Listening… Say one Mandarin word at a time, pausing between words. Click Stop dictation when finished.';
+    $('#dictationStatus').textContent = 'Listening… Say a word, term, or phrase, then pause to add it as a new characters|pinyin line.';
     $('#start').disabled = true;
   } catch { recognition = undefined; $('#dictationStatus').textContent = 'Could not start dictation. Check microphone access and try again.'; $('#dictate').textContent = 'Dictate words'; $('#dictate').setAttribute('aria-pressed', 'false'); $('#start').disabled = photoBusy; }
 };

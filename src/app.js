@@ -32,6 +32,7 @@ function stopDictation() {
   const current = recognition;
   if (!current) return;
   recognition = undefined;
+  clearTimeout(current.pauseTimer);
   $('#dictate').textContent = 'Dictate words';
   $('#dictate').setAttribute('aria-pressed', 'false');
   $('#start').disabled = photoBusy;
@@ -563,36 +564,58 @@ $('#dictate').onclick = () => {
   session.interimResults = true;
   const targetSet = sets.active;
   const handled = new Set();
+  const earlyCommitted = new Map();
   let heard = 0;
   let failed = false;
+  const addTranscript = (transcript, resultIndex, isEarly = false) => {
+    const phrase = (transcript.match(/\p{Script=Han}+/gu) || []).join('');
+    const committed = earlyCommitted.get(resultIndex) || '';
+    if (!isEarly && committed) return;
+    const pending = committed && phrase.startsWith(committed) ? phrase.slice(committed.length) : phrase;
+    const result = addDictationText(editor.value, pending);
+    if (!result.added) return;
+    snapshot();
+    editor.value = result.value;
+    saveList();
+    heard += result.added;
+    if (isEarly) earlyCommitted.set(resultIndex, phrase);
+  };
   session.onresult = event => {
     if (recognition !== session || sets.active !== targetSet) return;
     let interim = '';
+    let interimIndex = -1;
+    clearTimeout(session.pauseTimer);
     for (let i = event.resultIndex; i < event.results.length; i++) {
       const transcript = event.results[i][0].transcript;
       if (event.results[i].isFinal && !handled.has(i)) {
         handled.add(i);
-        const result = addDictationText(editor.value, transcript);
-        if (result.added) {
-          snapshot();
-          editor.value = result.value;
-          saveList();
-          heard += result.added;
-        }
+        addTranscript(transcript, i);
       } else if (!event.results[i].isFinal) {
         interim = transcript;
+        interimIndex = i;
       }
+    }
+    if (interim) {
+      const pausedTranscript = interim;
+      const pausedResultIndex = interimIndex;
+      session.pauseTimer = setTimeout(() => {
+        if (recognition !== session || sets.active !== targetSet) return;
+        addTranscript(pausedTranscript, pausedResultIndex, true);
+        $('#dictationStatus').textContent = `Pause detected — added ${heard} ${heard === 1 ? 'line' : 'lines'}. Keep speaking.`;
+      }, 550);
     }
     $('#dictationStatus').textContent = interim ? `Hearing: ${interim}` : heard ? `Added ${heard} pause-separated ${heard === 1 ? 'line' : 'lines'}. Keep speaking, or stop dictation.` : 'Listening… Speak Mandarin.';
   };
   session.onerror = event => {
     if (recognition !== session) return;
+    clearTimeout(session.pauseTimer);
     failed = true;
     const messages = { 'not-allowed': 'Allow microphone access in your browser, then try again.', 'service-not-allowed': 'Speech recognition is blocked by your browser. Check its speech settings.', 'audio-capture': 'No microphone was found. Connect one and try again.', 'no-speech': 'No speech was heard. Try again and speak closer to the microphone.', network: 'Speech service could not be reached. Check your connection and try again.', 'language-not-supported': 'Mandarin recognition is unavailable in this browser.', aborted: 'Dictation stopped.' };
     $('#dictationStatus').textContent = messages[event.error] || 'Dictation stopped. Check your microphone and try again.';
   };
   session.onend = () => {
     if (recognition !== session) return;
+    clearTimeout(session.pauseTimer);
     recognition = undefined;
     $('#dictate').textContent = 'Dictate words';
     $('#dictate').setAttribute('aria-pressed', 'false');
@@ -603,7 +626,7 @@ $('#dictate').onclick = () => {
     session.start();
     $('#dictate').textContent = 'Stop dictation';
     $('#dictate').setAttribute('aria-pressed', 'true');
-    $('#dictationStatus').textContent = 'Listening… Say a word, term, or phrase, then pause to add it as a new characters|pinyin line.';
+    $('#dictationStatus').textContent = 'Listening… Say a word, term, or phrase, then pause briefly to add it as a new characters|pinyin line.';
     $('#start').disabled = true;
   } catch { recognition = undefined; $('#dictationStatus').textContent = 'Could not start dictation. Check microphone access and try again.'; $('#dictate').textContent = 'Dictate words'; $('#dictate').setAttribute('aria-pressed', 'false'); $('#start').disabled = photoBusy; }
 };
